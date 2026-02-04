@@ -1,0 +1,22 @@
+{
+    "name": "cyper/price-intelligen",
+    "type": "magento2-module",
+    "authors": [
+        {
+            "name": "Ciro Perna"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+      "symfony/dom-crawler": "*",
+      "symfony/css-selector": "*"
+    },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Cyper\\PriceIntelligent\\": ""
+    }
+  }
+}
