@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!-- Suppliers table -->
+    <table name="cyper_suppliers" resource="default" engine="innodb" comment="Suppliers Table">
+        <column xsi:type="bigint" name="supplier_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Supplier Name"/>
+        <column xsi:type="varchar" name="source_type" nullable="false" length="255" comment="Source Type"/>
+        <column xsi:type="json" name="source_config" nullable="false" comment="Source Configuration (JSON)"/>
+        <column xsi:type="boolean" name="is_active" nullable="false" default="true" comment="Is Active"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="supplier_id"/>
+        </constraint>
+
+        <index referenceId="CYPER_SUPPLIERS_NAME_INDEX" indexType="btree">
+            <column name="name"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIERS_IS_ACTIVE_INDEX" indexType="btree">
+            <column name="is_active"/>
+        </index>
+    </table>
+
+    <!-- Supplier Products table -->
+    <table name="cyper_supplier_products" resource="default" engine="innodb" comment="Supplier Products">
+        <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="bigint" name="supplier_id" unsigned="true" nullable="false" comment="Supplier ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
+        <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
+        <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
+        <column xsi:type="timestamp" name="imported_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Imported At"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CYPER_SUPPLIER_PRODUCTS_SUPPLIER_ID_CYPER_SUPPLIERS_SUPPLIER_ID"
+                    table="cyper_supplier_products" column="supplier_id" referenceTable="cyper_suppliers"
+                    referenceColumn="supplier_id" onDelete="CASCADE"/>
+
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_SUPPLIER_ID_INDEX" indexType="btree">
+            <column name="supplier_id"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_SKU_INDEX" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
+            <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_IMPORTED_AT_INDEX" indexType="btree">
+            <column name="imported_at"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_PRICE_INDEX" indexType="btree">
+            <column name="price"/>
+        </index>
+    </table>
+
+    <!-- Competitors table -->
+    <table name="cyper_competitors" resource="default" engine="innodb" comment="Competitors">
+        <column xsi:type="bigint" name="competitor_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Competitor Name"/>
+        <column xsi:type="varchar" name="website" nullable="false" length="255" comment="Website"/>
+        <column xsi:type="json" name="crawler_config" nullable="false" comment="Crawler Configuration (JSON)"/>
+        <column xsi:type="boolean" name="is_active" nullable="false" default="true" comment="Is Active"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="competitor_id"/>
+        </constraint>
+
+        <index referenceId="CYPER_COMPETITORS_NAME_INDEX" indexType="btree">
+            <column name="name"/>
+        </index>
+        <index referenceId="CYPER_COMPETITORS_IS_ACTIVE_INDEX" indexType="btree">
+            <column name="is_active"/>
+        </index>
+    </table>
+
+    <!-- Competitor Prices table -->
+    <table name="cyper_competitor_prices" resource="default" engine="innodb" comment="Competitor Prices">
+        <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="bigint" name="competitor_id" unsigned="true" nullable="false" comment="Competitor ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
+        <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
+        <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
+        <column xsi:type="text" name="product_url" nullable="true" comment="Product URL"/>
+        <column xsi:type="timestamp" name="scraped_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Scraped At"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CYPER_COMPETITOR_PRICES_COMPETITOR_ID_CYPER_COMPETITORS_COMPETITOR_ID"
+                    table="cyper_competitor_prices" column="competitor_id" referenceTable="cyper_competitors"
+                    referenceColumn="competitor_id" onDelete="CASCADE"/>
+
+        <index referenceId="CYPER_COMPETITOR_PRICES_COMPETITOR_ID_INDEX" indexType="btree">
+            <column name="competitor_id"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
+            <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_SCRAPED_AT_INDEX" indexType="btree">
+            <column name="scraped_at"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_SALE_PRICE_INDEX" indexType="btree">
+            <column name="sale_price"/>
+        </index>
+    </table>
+
+    <!-- Price Comparisons table -->
+    <table name="cyper_price_comparisons" resource="default" engine="innodb" comment="Price Comparisons">
+        <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
+        <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
+        <column xsi:type="decimal" name="our_price" nullable="false" scale="2" precision="10" comment="Our Price"/>
+        <column xsi:type="decimal" name="competitor_price" nullable="false" scale="2" precision="10" comment="Competitor Price"/>
+        <column xsi:type="decimal" name="price_difference" nullable="false" scale="2" precision="10" comment="Price Difference"/>
+        <column xsi:type="boolean" name="is_competitive" nullable="false" comment="Is Competitive"/>
+        <column xsi:type="decimal" name="competitiveness_percentage" nullable="true" scale="2" precision="5" comment="Competitiveness Percentage"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <index referenceId="CYPER_PRICE_COMPARISONS_SKU_INDEX" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_PRICE_COMPARISONS_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
+        </index>
+        <index referenceId="CYPER_PRICE_COMPARISONS_NORMALIZED_SKU_INDEX" indexType="btree">
+            <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_PRICE_COMPARISONS_IS_COMPETITIVE_INDEX" indexType="btree">
+            <column name="is_competitive"/>
+        </index>
+        <index referenceId="CYPER_PRICE_COMPARISONS_OUR_PRICE_INDEX" indexType="btree">
+            <column name="our_price"/>
+        </index>
+        <index referenceId="CYPER_PRICE_COMPARISONS_COMPETITOR_PRICE_INDEX" indexType="btree">
+            <column name="competitor_price"/>
+        </index>
+    </table>
+
+    <!-- Best Supplier Products table -->
+    <table name="cyper_best_supplier_products" resource="default" engine="innodb" comment="Best Supplier Products">
+        <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
+        <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
+        <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
+        <column xsi:type="bigint" name="winner_supplier_id" unsigned="true" nullable="true" comment="Winner Supplier ID"/>
+        <column xsi:type="varchar" name="winner_supplier_name" nullable="true" length="255" comment="Winner Supplier Name"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_EAN_UNIQUE">
+            <column name="ean"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_WINNER_SUPPLIER_ID_CYPER_SUPPLIERS_SUPPLIER_ID"
+                    table="cyper_best_supplier_products" column="winner_supplier_id" referenceTable="cyper_suppliers"
+                    referenceColumn="supplier_id" onDelete="SET NULL"/>
+
+        <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_INDEX" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
+            <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_WINNER_SUPPLIER_ID_INDEX" indexType="btree">
+            <column name="winner_supplier_id"/>
+        </index>
+        <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_PRICE_INDEX" indexType="btree">
+            <column name="price"/>
+        </index>
+    </table>
+
+    <!-- Best Competitor Prices table -->
+    <table name="cyper_best_competitor_prices" resource="default" engine="innodb" comment="Best Competitor Prices">
+        <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
+        <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
+        <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
+        <column xsi:type="bigint" name="winner_competitor_id" unsigned="true" nullable="true" comment="Winner Competitor ID"/>
+        <column xsi:type="varchar" name="winner_competitor_name" nullable="false" length="255" comment="Winner Competitor Name"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="CYPER_BEST_COMPETITOR_PRICES_EAN_UNIQUE">
+            <column name="ean"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="CYPER_BEST_COMPETITOR_PRICES_WINNER_COMPETITOR_ID_CYPER_COMPETITORS_COMPETITOR_ID"
+                    table="cyper_best_competitor_prices" column="winner_competitor_id" referenceTable="cyper_competitors"
+                    referenceColumn="competitor_id" onDelete="SET NULL"/>
+
+        <index referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
+            <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_BEST_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
+            <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_BEST_COMPETITOR_PRICES_WINNER_COMPETITOR_ID_INDEX" indexType="btree">
+            <column name="winner_competitor_id"/>
+        </index>
+        <index referenceId="CYPER_BEST_COMPETITOR_PRICES_SALE_PRICE_INDEX" indexType="btree">
+            <column name="sale_price"/>
+        </index>
+    </table>
+</schema>

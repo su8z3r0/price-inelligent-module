@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Grid Collection for Listing -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_suppliers</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier</argument>
+            <argument name="identifierName" xsi:type="string">supplier_id</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="suppliers_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Cyper\PriceIntelligent\Ui\DataProvider\Supplier\Form\DataProvider">
+        <arguments>
+            <argument name="name" xsi:type="string">suppliers_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">supplier_id</argument>
+            <argument name="requestFieldName" xsi:type="string">supplier_id</argument>
+        </arguments>
+    </type>
+
+</config>

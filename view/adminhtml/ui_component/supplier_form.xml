@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">suppliers_form.suppliers_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Supplier Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+
+    <settings>
+        <buttons>
+            <button name="back" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\BackButton"/>
+            <button name="delete" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\DeleteButton"/>
+            <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\SaveButton"/>
+        </buttons>
+        <namespace>suppliers_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>suppliers_form.suppliers_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="suppliers_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="price_intelligent/suppliers/save"/>
+        </settings>
+        <dataProvider class="Cyper\PriceIntelligent\Ui\DataProvider\Supplier\Form\DataProvider" name="suppliers_form_data_source">
+            <settings>
+                <requestFieldName>supplier_id</requestFieldName>
+                <primaryFieldName>supplier_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">General Information</label>
+        </settings>
+
+        <field name="supplier_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>supplier_id</dataScope>
+            </settings>
+        </field>
+
+        <field name="name" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Name</label>
+                <dataScope>name</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="source_type" formElement="select" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Source Type</label>
+                <dataScope>source_type</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Cyper\PriceIntelligent\Model\Config\Source\SourceType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="is_active" formElement="checkbox" sortOrder="40">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Is Active</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+
+        <field name="source_config" formElement="textarea" sortOrder="50">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Source Configuration (JSON)</label>
+                <dataScope>source_config</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <textarea>
+                    <settings>
+                        <rows>10</rows>
+                    </settings>
+                </textarea>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

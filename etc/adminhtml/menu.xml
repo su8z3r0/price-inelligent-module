@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Cyper_PriceIntelligent::price_intelligent"
+             title="Price Intelligent"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="20"
+             resource="Cyper_PriceIntelligent::price_intelligent"/>
+
+        <add id="Cyper_PriceIntelligent::suppliers"
+             title="Suppliers"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="10"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="price_intelligent/suppliers/index"
+             resource="Cyper_PriceIntelligent::suppliers"/>
+    </menu>
+</config>
