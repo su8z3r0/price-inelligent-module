@@ -9,28 +9,13 @@
     </argument>
     <settings>
         <buttons>
-            <button name="back" class="Magento\Backend\Block\Widget\Button\Back"/>
-            <button name="save" class="Magento\Backend\Block\Widget\Button\SplitButton">
-                <data>
-                    <item name="label" xsi:type="string" translate="true">Save</item>
-                    <item name="class" xsi:type="string">primary</item>
-                    <item name="options" xsi:type="array">
-                        <item name="0" xsi:type="array">
-                            <item name="label" xsi:type="string" translate="true">Save &amp; Close</item>
-                            <item name="data_attribute" xsi:type="array">
-                                <item name="mage-init" xsi:type="string">{"button":{"event":"saveAndClose"}}</item>
-                            </item>
-                        </item>
-                        <item name="1" xsi:type="array">
-                            <item name="label" xsi:type="string" translate="true">Save &amp; Continue</item>
-                            <item name="data_attribute" xsi:type="array">
-                                <item name="mage-init" xsi:type="string">{"button":{"event":"saveAndContinueEdit"}}</item>
-                            </item>
-                        </item>
-                    </item>
-                </data>
+            <button name="back">
+                <url path="*/*/"/>
+                <class>back</class>
+                <label translate="true">Back</label>
             </button>
-            <button name="delete" class="Magento\Backend\Block\Widget\Button\Delete"/>
+            <button name="delete" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\DeleteButton"/>
+            <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\SaveButton"/>
         </buttons>
         <namespace>cyper_competitor_form</namespace>
         <dataScope>data</dataScope>
