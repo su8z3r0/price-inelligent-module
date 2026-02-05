@@ -4,16 +4,17 @@ declare(strict_types=1);
 namespace Cyper\PriceIntelligent\Model\Parser;
 
 use Cyper\PriceIntelligent\Api\ParserInterface;
-use Cyper\PriceIntelligent\Model\Supplier;
+use Cyper\PriceIntelligent\Api\PriceParserInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Filesystem\DirectoryList;
-use Magento\Framework\File\Csv as CsvProcessor;
+use Magento\Framework\File\Csv;
 
 class LocalParser implements ParserInterface
 {
     public function __construct(
         private readonly DirectoryList $directoryList,
-        private readonly CsvProcessor $csvProcessor
+        private readonly Csv $csvProcessor,
+        private readonly PriceParserInterface $priceParser
     ) {
     }
 
@@ -23,25 +24,47 @@ class LocalParser implements ParserInterface
             throw new LocalizedException(__('file_path non specificato nella configurazione'));
         }
 
-        $filePath = $this->directoryList->getPath('var') . '/suppliers/' . $config['file_path'];
+        // Supporta path assoluto o relativo a var/suppliers
+        $filePath = $config['file_path'];
+        if (!str_starts_with($filePath, '/')) {
+            $filePath = $this->directoryList->getPath('var') . '/suppliers/' . $filePath;
+        }
         
         if (!file_exists($filePath)) {
             throw new LocalizedException(__('File CSV non trovato: %1', $filePath));
         }
 
+        return $this->parseCSVFile($filePath, $config['columns'] ?? []);
+    }
+
+    public function getType(): string
+    {
+        return 'local';
+    }
+
+    /**
+     * Parse CSV file with explicit column mapping or auto-normalization
+     */
+    private function parseCSVFile(string $filePath, array $columnMapping): array
+    {
         $csvData = $this->csvProcessor->getData($filePath);
         
         if (empty($csvData)) {
             return [];
         }
 
-        // Prima riga = intestazioni
         $headers = array_shift($csvData);
-        $headers = $this->normalizeHeaders($headers);
+        
+        // Build index map from headers
+        if (!empty($columnMapping)) {
+            $headerIndexMap = $this->buildExplicitMapping($headers, $columnMapping);
+        } else {
+            $headerIndexMap = $this->buildAutoMapping($headers);
+        }
 
         $products = [];
         foreach ($csvData as $row) {
-            $product = $this->mapRow($headers, $row);
+            $product = $this->mapRow($headerIndexMap, $row);
             if ($product) {
                 $products[] = $product;
             }
@@ -50,74 +73,92 @@ class LocalParser implements ParserInterface
         return $products;
     }
 
-    public function getType(): string
+    /**
+     * Build mapping from explicit config
+     */
+    private function buildExplicitMapping(array $headers, array $columnMapping): array
     {
-        return 'local';
-    }
-
-    private function normalizeHeaders(array $headers): array
-    {
-        return array_map(function($header) {
-            $header = strtolower(trim($header));
-            
-            // Normalizza SKU
-            if (in_array($header, ['sku', 'codice', 'cod'])) {
-                return 'sku';
-            }
-            
-            // Normalizza titolo
-            if (in_array($header, ['titolo_prodotto', 'titolo', 'title'])) {
-                return 'title';
-            }
-            
-            // Normalizza prezzo
-            if (in_array($header, ['prezzo', 'price', 'prezzo_vendita'])) {
-                return 'price';
-            }
-            
-            // EAN
-            if (in_array($header, ['ean', 'ean13', 'barcode'])) {
-                return 'ean';
-            }
-            
-            return $header;
-        }, $headers);
-    }
-
-    private function mapRow(array $headers, array $row): ?array
-    {
-        $data = array_combine($headers, $row);
+        $map = [];
         
-        if (!isset($data['sku']) || !isset($data['title']) || !isset($data['price'])) {
-            return null; // Riga invalida
+        foreach ($headers as $index => $header) {
+            $normalizedHeader = strtolower(trim($header));
+            
+            foreach ($columnMapping as $field => $csvColumn) {
+                if (strtolower(trim($csvColumn)) === $normalizedHeader) {
+                    $map[$field] = $index;
+                    break;
+                }
+            }
         }
-
-        return [
-            'sku' => trim($data['sku']),
-            'title' => trim($data['title']),
-            'price' => $this->parsePrice($data['price']),
-            'ean' => isset($data['ean']) ? trim($data['ean']) : null
-        ];
+        
+        return $map;
     }
 
-    private function parsePrice(string $priceText): float
+    /**
+     * Build mapping with auto-normalization
+     */
+    private function buildAutoMapping(array $headers): array
     {
-        $clean = preg_replace('/[^0-9,.]/', '', $priceText);
+        $map = [];
         
-        if (empty($clean)) {
-            return 0.0;
+        foreach ($headers as $index => $header) {
+            $normalized = $this->normalizeHeader(strtolower(trim($header)));
+            if ($normalized) {
+                $map[$normalized] = $index;
+            }
         }
+        
+        return $map;
+    }
 
-        // Gestisce formati europei (1.200,50) e americani (1,200.50)
-        if (substr_count($clean, ',') === 1 && substr_count($clean, '.') >= 1) {
-            $clean = str_replace('.', '', $clean);
-            $clean = str_replace(',', '.', $clean);
-        } elseif (substr_count($clean, ',') >= 1) {
-            $clean = str_replace(',', '', $clean);
-        } elseif (substr_count($clean, ',') === 1) {
-            $clean = str_replace(',', '.', $clean);
+    /**
+     * Auto-normalize header
+     */
+    private function normalizeHeader(string $header): ?string
+    {
+        if (in_array($header, ['sku', 'codice', 'cod'])) {
+            return 'sku';
         }
+        
+        if (in_array($header, ['titolo_prodotto', 'titolo', 'title'])) {
+            return 'title';
+        }
+        
+        if (in_array($header, ['prezzo', 'price', 'prezzo_vendita'])) {
+            return 'price';
+        }
+        
+        if (in_array($header, ['ean', 'ean13', 'barcode'])) {
+            return 'ean';
+        }
+        
+        return null;
+    }
 
-        return (float) $clean;
+    /**
+     * Map CSV row to product
+     */
+    private function mapRow(array $headerIndexMap, array $row): ?array
+    {
+        if (!isset($headerIndexMap['sku']) || !isset($headerIndexMap['title']) || !isset($headerIndexMap['price'])) {
+            return null;
+        }
+        
+        $product = [];
+        $product['sku'] = $row[$headerIndexMap['sku']] ?? null;
+        $product['title'] = $row[$headerIndexMap['title']] ?? null;
+        $priceText = $row[$headerIndexMap['price']] ?? null;
+        
+        if (!$product['sku'] || !$product['title'] || !$priceText) {
+            return null;
+        }
+        
+        $product['price'] = $this->priceParser->parse($priceText);
+        
+        if (isset($headerIndexMap['ean'])) {
+            $product['ean'] = $row[$headerIndexMap['ean']] ?? null;
+        }
+        
+        return $product;
     }
 }

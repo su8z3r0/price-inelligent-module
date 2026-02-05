@@ -155,32 +155,80 @@ Il modulo crea automaticamente queste tabelle:
 #### Local CSV
 ```json
 {
-  "file_path": "fornitore1.csv"
+  "source_type": "local",
+  "file_path": "fornitore1.csv",
+  "columns": {
+    "sku": "codice",
+    "title": "titolo_prodotto",
+    "price": "prezzo",
+    "ean": "ean13"
+  }
 }
 ```
-File va in: `var/suppliers/fornitore1.csv`
+
+**Path**:
+- Relativo: `fornitore1.csv` → cerca in `var/suppliers/fornitore1.csv`
+- Assoluto: `/var/www/magento/var/import/fornitore1.csv`
+
+**Nota**: Il campo `columns` è opzionale. Se omesso, usa auto-normalizzazione header.
 
 #### FTP
 ```json
 {
-  "host": "ftp.supplier.com",
-  "port": 21,
-  "username": "user",
-  "password": "pass",
-  "remote_path": "/exports/products.csv"
+  "source_type": "ftp",
+  "ftp_host": "ftp.supplier.com",
+  "ftp_port": 21,
+  "ftp_username": "user",
+  "ftp_password": "pass",
+  "ftp_path": "/exports/products.csv",
+  "columns": {
+    "sku": "product_code",
+    "title": "product_name",
+    "price": "sale_price"
+  }
 }
 ```
 
 #### HTTP
 ```json
 {
-  "url": "https://supplier.com/feed/products.csv"
+  "source_type": "http",
+  "http_url": "https://supplier.com/feed/products.csv",
+  "columns": {
+    "sku": "SKU",
+    "title": "Title",
+    "price": "Price"
+  }
 }
 ```
 
 ### 3. Formato CSV Fornitore
 
-Il parser normalizza automaticamente gli header. Supporta varie nomenclature:
+#### Con Mapping Esplicito (Raccomandato)
+
+Specifica la mappatura delle colonne nel config JSON:
+
+```json
+{
+  "columns": {
+    "sku": "codice_articolo",
+    "title": "descrizione",
+    "price": "prezzo_listino",
+    "ean": "barcode"
+  }
+}
+```
+
+**CSV**:
+```csv
+codice_articolo,descrizione,prezzo_listino,barcode
+PROD001,Prodotto 1,99.90,1234567890123
+PROD002,Prodotto 2,149.50,9876543210987
+```
+
+#### Auto-Normalizzazione (Backward Compatibility)
+
+Se ometti il campo `columns`, il parser tenta di normalizzare automaticamente gli header:
 
 | Campo Normalizzato | Header Supportati |
 |-------------------|-------------------|
@@ -189,7 +237,7 @@ Il parser normalizza automaticamente gli header. Supporta varie nomenclature:
 | `price` | prezzo, price, prezzo_vendita |
 | `ean` | ean, ean13, barcode |
 
-**Esempio CSV**:
+**CSV**:
 ```csv
 codice,titolo_prodotto,prezzo,ean
 PROD001,Prodotto 1,99.90,1234567890123
