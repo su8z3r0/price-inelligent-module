@@ -67,7 +67,7 @@
         <arguments>
             <argument name="parsers" xsi:type="array">
                 <item name="local" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\LocalParser</item>
-                <item name="csv" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\CsvParser</item>
+                <item name="ftp" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\FtpParser</item>
                 <item name="http" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\HttpParser</item>
             </argument>
         </arguments>
