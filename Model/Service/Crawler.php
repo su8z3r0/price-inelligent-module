@@ -5,47 +5,110 @@ namespace Cyper\PriceIntelligent\Model\Service;
 
 use Cyper\PriceIntelligent\Api\CrawlerInterface;
 use Cyper\PriceIntelligent\Api\PriceParserInterface;
+use Cyper\PriceIntelligent\Api\ProxyRotatorInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Psr\Log\LoggerInterface;
 
 class Crawler implements CrawlerInterface
 {
+    private const CONFIG_PATH_MAX_RETRIES = 'price_intelligent/proxy/max_retries';
+
     protected $curl;
     protected $logger;
     protected $priceParser;
+    protected $proxyRotator;
+    protected $scopeConfig;
 
     public function __construct(
         Curl $curl,
         LoggerInterface $logger,
-        PriceParserInterface $priceParser
+        PriceParserInterface $priceParser,
+        ProxyRotatorInterface $proxyRotator,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->curl = $curl;
         $this->logger = $logger;
         $this->priceParser = $priceParser;
+        $this->proxyRotator = $proxyRotator;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function scrapeProduct(array $config, string $url): array
     {
-        try {
-            $this->curl->setTimeout(30);
-            $this->curl->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-            $this->curl->get($url);
+        $maxRetries = (int) $this->scopeConfig->getValue(self::CONFIG_PATH_MAX_RETRIES) ?: 3;
+        $attempt = 0;
+        $lastException = null;
 
-            $html = $this->curl->getBody();
-            $crawler = new DomCrawler($html);
+        while ($attempt < $maxRetries) {
+            try {
+                // Get proxy if enabled
+                $proxy = $this->proxyRotator->getNextProxy();
+                
+                // Configure CURL
+                $this->curl->setTimeout(30);
+                $this->curl->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+                
+                // Set proxy if available
+                if ($proxy) {
+                    $this->curl->setOption(CURLOPT_PROXY, $proxy['url']);
+                    if (!empty($proxy['username']) && !empty($proxy['password'])) {
+                        $this->curl->setOption(CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
+                    }
+                    $this->logger->info('Scraping with proxy: ' . $proxy['url']);
+                }
+                
+                $this->curl->get($url);
+                $html = $this->curl->getBody();
+                
+                // Check if we got valid HTML
+                if (empty($html)) {
+                    throw new \RuntimeException('Empty response from server');
+                }
+                
+                $crawler = new DomCrawler($html);
 
-            return [
-                'product_url' => $url,
-                'ean' => $this->extractEan($crawler, $config),
-                'product_title' => trim($this->extractTitle($crawler, $config)),
-                'sale_price' => $this->extractPrice($crawler, $config),
-                'scraped_at' => date('Y-m-d H:i:s'),
-            ];
-        } catch (\Exception $e) {
-            $this->logger->error('Scraping failed', ['url' => $url, 'error' => $e->getMessage()]);
-            throw $e;
+                return [
+                    'product_url' => $url,
+                    'ean' => $this->extractEan($crawler, $config),
+                    'product_title' => trim($this->extractTitle($crawler, $config)),
+                    'sale_price' => $this->extractPrice($crawler, $config),
+                    'scraped_at' => date('Y-m-d H:i:s'),
+                ];
+                
+            } catch (\Exception $e) {
+                $lastException = $e;
+                $attempt++;
+                
+                // Mark proxy as failed if used
+                if ($proxy) {
+                    $this->proxyRotator->markProxyAsFailed($proxy['url']);
+                    $this->logger->warning('Proxy failed, attempt ' . $attempt . '/' . $maxRetries, [
+                        'proxy' => $proxy['url'],
+                        'error' => $e->getMessage()
+                    ]);
+                } else {
+                    $this->logger->warning('Scraping failed (no proxy), attempt ' . $attempt . '/' . $maxRetries, [
+                        'url' => $url,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+                
+                // Sleep before retry
+                if ($attempt < $maxRetries) {
+                    sleep(2);
+                }
+            }
         }
+        
+        // All retries failed
+        $this->logger->error('Scraping failed after ' . $maxRetries . ' attempts', [
+            'url' => $url,
+            'last_error' => $lastException->getMessage()
+        ]);
+        
+        throw $lastException;
     }
 
     protected function extractEan(DomCrawler $crawler, array $config): ?string

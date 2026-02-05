@@ -3,6 +3,7 @@
 
     <preference for="Cyper\PriceIntelligent\Api\CrawlerInterface" type="Cyper\PriceIntelligent\Model\Service\Crawler"/>
     <preference for="Cyper\PriceIntelligent\Api\PriceParserInterface" type="Cyper\PriceIntelligent\Model\Service\PriceParser"/>
+    <preference for="Cyper\PriceIntelligent\Api\ProxyRotatorInterface" type="Cyper\PriceIntelligent\Model\Service\ProxyRotator"/>
 
 
     <!-- Grid Collection for Listing -->
