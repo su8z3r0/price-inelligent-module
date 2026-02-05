@@ -16,5 +16,32 @@
              parent="Cyper_PriceIntelligent::price_intelligent"
              action="price_intelligent/suppliers/index"
              resource="Cyper_PriceIntelligent::suppliers"/>
+
+        <add id="Cyper_PriceIntelligent::competitors"
+             title="Competitors"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="20"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="competitors/competitors/index"
+             resource="Cyper_PriceIntelligent::competitors"/>
+
+        <add id="Cyper_PriceIntelligent::competitor_prices"
+             title="Prezzi Competitor"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="30"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="competitor_prices/competitorprices/index"
+             resource="Cyper_PriceIntelligent::competitor_prices"/>
+
+        <add id="Cyper_PriceIntelligent::price_comparisons"
+             title="Analisi Competitività"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="40"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="price_comparisons/pricecomparisons/index"
+             resource="Cyper_PriceIntelligent::price_comparisons"/>
     </menu>
 </config>

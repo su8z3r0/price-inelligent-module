@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">cyper_price_comparisons_listing.cyper_price_comparisons_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>cyper_price_comparisons_columns</spinner>
+        <deps>
+            <dep>cyper_price_comparisons_listing.cyper_price_comparisons_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="cyper_price_comparisons_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="cyper_price_comparisons_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+        <exportButton name="export_button"/>
+    </listingToolbar>
+    <columns name="cyper_price_comparisons_columns">
+        <column name="id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">ID</label>
+                <sorting>desc</sorting>
+            </settings>
+        </column>
+        <column name="sku">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">SKU</label>
+            </settings>
+        </column>
+        <column name="ean">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">EAN</label>
+            </settings>
+        </column>
+        <column name="product_title">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Prodotto</label>
+            </settings>
+        </column>
+        <column name="our_price">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Nostro Prezzo</label>
+            </settings>
+        </column>
+        <column name="competitor_price">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Prezzo Competitor</label>
+            </settings>
+        </column>
+        <column name="price_difference">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Differenza</label>
+            </settings>
+        </column>
+        <column name="is_competitive" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Competitivo</label>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+            </settings>
+        </column>
+        <column name="competitiveness_percentage">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">% Competitività</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

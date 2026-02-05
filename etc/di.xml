@@ -13,10 +13,40 @@
         </arguments>
     </virtualType>
 
+    <!-- Competitors Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\Competitor\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_competitors</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Competitor</argument>
+            <argument name="identifierName" xsi:type="string">competitor_id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Competitor Prices Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_competitor_prices</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Price Comparisons Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_price_comparisons</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
                 <item name="suppliers_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection</item>
+                <item name="cyper_competitors_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Competitor\Grid\Collection</item>
+                <item name="cyper_competitor_prices_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\Grid\Collection</item>
+                <item name="cyper_price_comparisons_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons\Grid\Collection</item>
             </argument>
         </arguments>
     </type>
@@ -49,6 +79,18 @@
                 <item name="local" xsi:type="string">Local</item>
                 <item name="csv" xsi:type="string">CSV</item>
                 <item name="http" xsi:type="string">Http</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Console Commands -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="cyper_crawler_scrape" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CrawlerScrapeCommand</item>
+                <item name="cyper_competitor_find_best" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CompetitorFindBestCommand</item>
+                <item name="cyper_supplier_match" xsi:type="object">Cyper\PriceIntelligent\Console\Command\SupplierMatchCommand</item>
+                <item name="cyper_analysis_competitiveness" xsi:type="object">Cyper\PriceIntelligent\Console\Command\AnalysisCompetitivenessCommand</item>
             </argument>
         </arguments>
     </type>
