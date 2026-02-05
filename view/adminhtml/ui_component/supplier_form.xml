@@ -82,6 +82,70 @@
             </formElements>
         </field>
 
+        <!-- Notice for LOCAL type -->
+        <container name="local_notice_container" sortOrder="31">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
+                    <item name="additionalClasses" xsi:type="string">admin__field-note</item>
+                    <item name="content" xsi:type="string" translate="true"><![CDATA[
+                        <div class="message message-notice">
+                            <strong>Local Type Configuration:</strong><br/>
+                            • Files must be placed in: <code>var/suppliers/</code><br/>
+                            • Example: <code>{"file_path": "supplier1.csv", "columns": {"sku": "codice", "title": "nome", "price": "prezzo"}}</code>
+                        </div>
+                    ]]></item>
+                </item>
+            </argument>
+            <settings>
+                <imports>
+                    <link name="visible">supplier_form.supplier_form.general.source_type:value</link>
+                </imports>
+            </settings>
+        </container>
+
+        <!-- Notice for FTP type -->
+        <container name="ftp_notice_container" sortOrder="32">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
+                    <item name="additionalClasses" xsi:type="string">admin__field-note</item>
+                    <item name="content" xsi:type="string" translate="true"><![CDATA[
+                        <div class="message message-notice">
+                            <strong>FTP Type Configuration:</strong><br/>
+                            • Example: <code>{"ftp_host": "ftp.example.com", "ftp_port": 21, "ftp_username": "user", "ftp_password": "pass", "ftp_path": "/exports/products.csv", "columns": {"sku": "...", "title": "...", "price": "..."}}</code>
+                        </div>
+                    ]]></item>
+                </item>
+            </argument>
+            <settings>
+                <imports>
+                    <link name="visible">supplier_form.supplier_form.general.source_type:value</link>
+                </imports>
+            </settings>
+        </container>
+
+        <!-- Notice for HTTP type -->
+        <container name="http_notice_container" sortOrder="33">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
+                    <item name="additionalClasses" xsi:type="string">admin__field-note</item>
+                    <item name="content" xsi:type="string" translate="true"><![CDATA[
+                        <div class="message message-notice">
+                            <strong>HTTP Type Configuration:</strong><br/>
+                            • Example: <code>{"http_url": "https://example.com/products.csv", "columns": {"sku": "...", "title": "...", "price": "..."}}</code>
+                        </div>
+                    ]]></item>
+                </item>
+            </argument>
+            <settings>
+                <imports>
+                    <link name="visible">supplier_form.supplier_form.general.source_type:value</link>
+                </imports>
+            </settings>
+        </container>
+
         <field name="is_active" formElement="checkbox" sortOrder="40">
             <settings>
                 <dataType>boolean</dataType>
@@ -109,7 +173,6 @@
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
-                <notice translate="true">LOCAL TYPE: Files must be placed in var/suppliers/ directory. Example: {"source_type": "local", "file_path": "supplier1.csv", "columns": {"sku": "codice", "title": "nome", "price": "prezzo"}} | FTP TYPE: {"source_type": "ftp", "ftp_host": "...", "ftp_username": "...", "ftp_password": "...", "ftp_path": "/file.csv", "columns": {...}} | HTTP TYPE: {"source_type": "http", "http_url": "https://...", "columns": {...}}</notice>
             </settings>
             <formElements>
                 <textarea>
