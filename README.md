@@ -406,6 +406,175 @@ class CustomParser implements ParserInterface
 
 ---
 
+## 🔌 Creare Parser Personalizzati
+
+Il sistema è completamente estensibile. Ogni parser può definire la propria configurazione JSON senza vincoli.
+
+### Esempio: Parser API JSON
+
+**1. Crea la Classe Parser**:
+
+```php
+<?php
+namespace Vendor\Module\Model\Parser;
+
+use Cyper\PriceIntelligent\Api\ParserInterface;
+use Magento\Framework\HTTP\Client\Curl;
+
+class ApiJsonParser implements ParserInterface
+{
+    public function __construct(
+        private readonly Curl $httpClient
+    ) {}
+
+    public function parse(array $config): array
+    {
+        // I tuoi campi custom - nessun vincolo!
+        $apiUrl = $config['api_url'];
+        $apiKey = $config['api_key'] ?? null;
+        $jsonPath = $config['json_path'] ?? 'data.products';
+        $mapping = $config['mapping'] ?? [];
+        
+        // Chiamata API
+        $this->httpClient->addHeader('Authorization', "Bearer $apiKey");
+        $this->httpClient->get($apiUrl);
+        
+        $response = json_decode($this->httpClient->getBody(), true);
+        
+        // Naviga nel JSON usando json_path
+        $items = $this->extractFromPath($response, $jsonPath);
+        
+        $products = [];
+        foreach ($items as $item) {
+            $products[] = [
+                'sku' => $this->getNestedValue($item, $mapping['sku']),
+                'title' => $this->getNestedValue($item, $mapping['title']),
+                'price' => (float) $this->getNestedValue($item, $mapping['price']),
+            ];
+        }
+        
+        return $products;
+    }
+    
+    public function getType(): string
+    {
+        return 'api_json';
+    }
+    
+    private function extractFromPath(array $data, string $path): array
+    {
+        // Implementazione navigazione JSON path (es: "data.items")
+        $keys = explode('.', $path);
+        foreach ($keys as $key) {
+            $data = $data[$key] ?? [];
+        }
+        return is_array($data) ? $data : [];
+    }
+    
+    private function getNestedValue(array $data, string $path)
+    {
+        $keys = explode('.', $path);
+        foreach ($keys as $key) {
+            $data = $data[$key] ?? null;
+            if ($data === null) break;
+        }
+        return $data;
+    }
+}
+```
+
+**2. Registra in `di.xml`**:
+
+```xml
+<type name="Cyper\PriceIntelligent\Model\ParserFactory">
+    <arguments>
+        <argument name="parsers" xsi:type="array">
+            <!-- Parser esistenti -->
+            <item name="local" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\LocalParser</item>
+            <item name="ftp" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\FtpParser</item>
+            <item name="http" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\HttpParser</item>
+            
+            <!-- Il tuo parser custom -->
+            <item name="api_json" xsi:type="object">Vendor\Module\Model\Parser\ApiJsonParser</item>
+        </argument>
+    </arguments>
+</type>
+```
+
+**3. Configura Supplier con JSON Custom**:
+
+```json
+{
+  "source_type": "api_json",
+  "api_url": "https://api.supplier.com/v1/products",
+  "api_key": "your-secret-key-123",
+  "json_path": "data.items",
+  "mapping": {
+    "sku": "product.code",
+    "title": "product.name",
+    "price": "pricing.wholesale"
+  }
+}
+```
+
+### 💡 Vantaggi del Design
+
+- **Zero Vincoli**: Ogni parser riceve l'intero array `$config` e decide come interpretarlo
+- **Indipendenza**: Parser custom non influenzano quelli esistenti
+- **Flessibilità**: Puoi mixare parser con strutture JSON diverse
+- **Estensibilità**: Aggiungi nuovi parser senza modificare codice esistente
+
+### Esempi Parser Custom
+
+#### Parser XML Feed
+```json
+{
+  "source_type": "xml_feed",
+  "xml_url": "https://supplier.com/feed.xml",
+  "xpath_products": "//product",
+  "xpath_sku": "./sku/text()",
+  "xpath_title": "./name/text()",
+  "xpath_price": "./price/@value"
+}
+```
+
+#### Parser Database Esterno
+```json
+{
+  "source_type": "external_db",
+  "db_host": "db.supplier.com",
+  "db_name": "products",
+  "db_user": "readonly",
+  "db_pass": "secret",
+  "query": "SELECT code, name, price FROM products WHERE active=1"
+}
+```
+
+#### Parser Google Sheets
+```json
+{
+  "source_type": "google_sheets",
+  "sheet_id": "1A2B3C4D5E6F7G8H",
+  "range": "Products!A2:D1000",
+  "credentials_file": "/path/to/service-account.json",
+  "columns": {
+    "sku": 0,
+    "title": 1,
+    "price": 2
+  }
+}
+```
+
+### 📝 Best Practices
+
+1. **Prefissi Campi**: Usa prefissi per evitare collisioni (es: `api_`, `db_`, `xml_`)
+2. **Validazione**: Valida sempre i campi richiesti nel metodo `parse()`
+3. **Error Handling**: Lancia `LocalizedException` con messaggi chiari
+4. **Logging**: Usa `LoggerInterface` per debug e monitoraggio
+5. **Type Identifier**: Il metodo `getType()` deve essere univoco
+
+---
+
 ## 🐛 Troubleshooting
 
 ### Errore: "Cannot instantiate interface"
