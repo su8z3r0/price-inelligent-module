@@ -6,20 +6,20 @@ namespace Cyper\PriceIntelligent\Model\Parser;
 use Cyper\PriceIntelligent\Api\ParserInterface;
 use Cyper\PriceIntelligent\Model\Supplier;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem\DirectoryList;
 
 class FtpParser implements ParserInterface
 {
     private const TEMP_FILE = '/tmp/supplier_ftp_temp.csv';
 
     public function __construct(
-        private readonly LocalParser $localParser
+        private readonly LocalParser $localParser,
+        private readonly DirectoryList $directoryList
     ) {
     }
 
-    public function parse(Supplier $supplier): \Illuminate\Support\Collection
+    public function parse(array $config): array
     {
-        $config = $supplier->getSourceConfig();
-        
         if (!isset($config['host'], $config['username'], $config['password'], $config['remote_path'])) {
             throw new LocalizedException(__('Configurazione FTP incompleta'));
         }
@@ -42,7 +42,13 @@ class FtpParser implements ParserInterface
         ftp_pasv($ftpConnection, true);
 
         // Download file
-        $downloaded = ftp_get($ftpConnection, self::TEMP_FILE, $config['remote_path'], FTP_BINARY);
+        $tempDir = $this->directoryList->getPath('var') . '/tmp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+        
+        $tempFile = $tempDir . '/ftp_csv_' . time() . '.csv';
+        $downloaded = ftp_get($ftpConnection, $tempFile, $config['remote_path'], FTP_BINARY);
         
         ftp_close($ftpConnection);
 
@@ -50,18 +56,20 @@ class FtpParser implements ParserInterface
             throw new LocalizedException(__('Impossibile scaricare file da FTP'));
         }
 
-        // Crea supplier temporaneo con path locale
-        $tempSupplier = clone $supplier;
-        $tempSupplier->setSourceConfig(['file_path' => basename(self::TEMP_FILE)]);
-
         // Usa LocalParser
-        $products = $this->localParser->parse($tempSupplier);
+        $localConfig = ['file_path' => basename($tempFile)];
+        $products = $this->localParser->parse($localConfig);
 
         // Pulisci file temporaneo
-        if (file_exists(self::TEMP_FILE)) {
-            unlink(self::TEMP_FILE);
+        if (file_exists($tempFile)) {
+            unlink($tempFile);
         }
 
         return $products;
+    }
+
+    public function getType(): string
+    {
+        return 'ftp';
     }
 }

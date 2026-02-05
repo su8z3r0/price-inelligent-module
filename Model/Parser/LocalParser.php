@@ -17,10 +17,8 @@ class LocalParser implements ParserInterface
     ) {
     }
 
-    public function parse(Supplier $supplier): \Illuminate\Support\Collection
+    public function parse(array $config): array
     {
-        $config = $supplier->getSourceConfig();
-        
         if (!isset($config['file_path'])) {
             throw new LocalizedException(__('file_path non specificato nella configurazione'));
         }
@@ -34,22 +32,27 @@ class LocalParser implements ParserInterface
         $csvData = $this->csvProcessor->getData($filePath);
         
         if (empty($csvData)) {
-            return collect([]);
+            return [];
         }
 
         // Prima riga = intestazioni
         $headers = array_shift($csvData);
         $headers = $this->normalizeHeaders($headers);
 
-        $products = collect();
+        $products = [];
         foreach ($csvData as $row) {
             $product = $this->mapRow($headers, $row);
             if ($product) {
-                $products->push($product);
+                $products[] = $product;
             }
         }
 
         return $products;
+    }
+
+    public function getType(): string
+    {
+        return 'local';
     }
 
     private function normalizeHeaders(array $headers): array

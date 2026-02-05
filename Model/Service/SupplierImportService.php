@@ -34,10 +34,10 @@ class SupplierImportService
         }
 
         $parser = $this->parserFactory->create($supplier->getSourceType());
-        $products = $parser->parse($supplier);
+        $products = $parser->parse($supplier->getSourceConfig());
 
         if ($output) {
-            $output->writeln("<comment>Trovati {$products->count()} prodotti nel CSV</comment>");
+            $output->writeln("<comment>Trovati " . count($products) . " prodotti nel CSV</comment>");
         }
 
         $imported = 0;
