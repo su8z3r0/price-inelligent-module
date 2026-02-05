@@ -6,21 +6,18 @@ namespace Cyper\PriceIntelligent\Model;
 use Cyper\PriceIntelligent\Api\ParserInterface;
 use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * Factory for creating parsers via Pool
+ */
 class ParserFactory
 {
-    private array $parsers;
-
-    /**
-     * @param array $parsers Associative array of ['type' => ParserInstance]
-     */
     public function __construct(
-        array $parsers = []
+        private readonly ParserPool $parserPool
     ) {
-        $this->parsers = $parsers;
     }
 
     /**
-     * Crea il parser appropriato in base al tipo
+     * Create parser by type
      *
      * @param string $sourceType
      * @return ParserInterface
@@ -28,20 +25,16 @@ class ParserFactory
      */
     public function create(string $sourceType): ParserInterface
     {
-        if (!isset($this->parsers[$sourceType])) {
-            throw new LocalizedException(__('Tipo sorgente non supportato: %1', $sourceType));
-        }
-
-        return $this->parsers[$sourceType];
+        return $this->parserPool->getParser($sourceType);
     }
 
     /**
      * Get all available parser types
      *
-     * @return array
+     * @return string[]
      */
     public function getAvailableTypes(): array
     {
-        return array_keys($this->parsers);
+        return $this->parserPool->getAvailableTypes();
     }
 }

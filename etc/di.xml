@@ -62,13 +62,26 @@
         </arguments>
     </type>
 
-    <!-- Parser Factory (Strategy Pattern) -->
-    <type name="Cyper\PriceIntelligent\Model\ParserFactory">
+
+    <!-- Parser Pool (Magento-style pattern) -->
+    <type name="Cyper\PriceIntelligent\Model\ParserPool">
         <arguments>
             <argument name="parsers" xsi:type="array">
                 <item name="local" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\LocalParser</item>
                 <item name="ftp" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\FtpParser</item>
                 <item name="http" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\HttpParser</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Source Type Labels Configuration -->
+    <type name="Cyper\PriceIntelligent\Model\Config\Source\SourceType">
+        <arguments>
+            <argument name="parserFactory" xsi:type="object">Cyper\PriceIntelligent\Model\ParserFactory</argument>
+            <argument name="labels" xsi:type="array">
+                <item name="local" xsi:type="string">Local CSV</item>
+                <item name="ftp" xsi:type="string">FTP</item>
+                <item name="http" xsi:type="string">HTTP</item>
             </argument>
         </arguments>
     </type>

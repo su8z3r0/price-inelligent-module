@@ -388,7 +388,7 @@ class CustomParser implements ParserInterface
 
 **2. Registra in `di.xml`**:
 ```xml
-<type name="Cyper\PriceIntelligent\Model\ParserFactory">
+<type name="Cyper\PriceIntelligent\Model\ParserPool">
     <arguments>
         <argument name="parsers" xsi:type="array">
             <item name="custom" xsi:type="object">Vendor\Module\Model\Parser\CustomParser</item>
@@ -396,6 +396,8 @@ class CustomParser implements ParserInterface
     </arguments>
 </type>
 ```
+
+**Nota**: Il pattern Pool permette facilmente di aggiungere/sovrascrivere parser tramite merge dei configs.
 
 ### Override Crawler
 
@@ -486,7 +488,7 @@ class ApiJsonParser implements ParserInterface
 **2. Registra in `di.xml`**:
 
 ```xml
-<type name="Cyper\PriceIntelligent\Model\ParserFactory">
+<type name="Cyper\PriceIntelligent\Model\ParserPool">
     <arguments>
         <argument name="parsers" xsi:type="array">
             <!-- Parser esistenti -->
