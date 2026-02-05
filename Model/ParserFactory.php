@@ -4,18 +4,19 @@ declare(strict_types=1);
 namespace Cyper\PriceIntelligent\Model;
 
 use Cyper\PriceIntelligent\Api\ParserInterface;
-use Cyper\PriceIntelligent\Model\Parser\LocalParser;
-use Cyper\PriceIntelligent\Model\Parser\FtpParser;
-use Cyper\PriceIntelligent\Model\Parser\HttpParser;
 use Magento\Framework\Exception\LocalizedException;
 
 class ParserFactory
 {
+    private array $parsers;
+
+    /**
+     * @param array $parsers Associative array of ['type' => ParserInstance]
+     */
     public function __construct(
-        private readonly LocalParser $localParser,
-        private readonly FtpParser $ftpParser,
-        private readonly HttpParser $httpParser
+        array $parsers = []
     ) {
+        $this->parsers = $parsers;
     }
 
     /**
@@ -27,11 +28,20 @@ class ParserFactory
      */
     public function create(string $sourceType): ParserInterface
     {
-        return match($sourceType) {
-            'local' => $this->localParser,
-            'ftp' => $this->ftpParser,
-            'http' => $this->httpParser,
-            default => throw new LocalizedException(__('Tipo sorgente non supportato: %1', $sourceType))
-        };
+        if (!isset($this->parsers[$sourceType])) {
+            throw new LocalizedException(__('Tipo sorgente non supportato: %1', $sourceType));
+        }
+
+        return $this->parsers[$sourceType];
+    }
+
+    /**
+     * Get all available parser types
+     *
+     * @return array
+     */
+    public function getAvailableTypes(): array
+    {
+        return array_keys($this->parsers);
     }
 }

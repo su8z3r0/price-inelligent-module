@@ -85,14 +85,14 @@
         </arguments>
     </type>
 
-    <!-- Console Commands -->
-    <type name="Magento\Framework\Console\CommandList">
+    <!-- Console Commands Registration -->
+    <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="cyper_crawler_scrape" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CrawlerScrapeCommand</item>
-                <item name="cyper_competitor_find_best" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CompetitorFindBestCommand</item>
-                <item name="cyper_supplier_match" xsi:type="object">Cyper\PriceIntelligent\Console\Command\SupplierMatchCommand</item>
-                <item name="cyper_analysis_competitiveness" xsi:type="object">Cyper\PriceIntelligent\Console\Command\AnalysisCompetitivenessCommand</item>
+                <item name="crawler_scrape" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CrawlerScrapeCommand</item>
+                <item name="competitor_find_best" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CompetitorFindBestCommand</item>
+                <item name="supplier_match" xsi:type="object">Cyper\PriceIntelligent\Console\Command\SupplierMatchCommand</item>
+                <item name="analysis_competitiveness" xsi:type="object">Cyper\PriceIntelligent\Console\Command\AnalysisCompetitivenessCommand</item>
             </argument>
         </arguments>
     </type>
