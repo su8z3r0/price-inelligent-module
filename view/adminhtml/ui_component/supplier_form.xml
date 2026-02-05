@@ -82,89 +82,6 @@
             </formElements>
         </field>
 
-        <!-- Notice for LOCAL type -->
-        <container name="local_notice_container" sortOrder="31">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-note</item>
-                    <item name="content" xsi:type="string" translate="true"><![CDATA[
-                        <div class="message message-notice">
-                            <strong>Local Type Configuration:</strong><br/>
-                            • Files must be placed in: <code>var/suppliers/</code><br/>
-                            • Example: <code>{"file_path": "supplier1.csv", "columns": {"sku": "codice", "title": "nome", "price": "prezzo"}}</code>
-                        </div>
-                    ]]></item>
-                </item>
-            </argument>
-            <settings>
-                <imports>
-                    <link name="visible">supplier_form.supplier_form.general.source_type:value</link>
-                </imports>
-            </settings>
-        </container>
-
-        <!-- Notice for FTP type -->
-        <container name="ftp_notice_container" sortOrder="32">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-note</item>
-                    <item name="content" xsi:type="string" translate="true"><![CDATA[
-                        <div class="message message-notice">
-                            <strong>FTP Type Configuration:</strong><br/>
-                            • Example: <code>{"ftp_host": "ftp.example.com", "ftp_port": 21, "ftp_username": "user", "ftp_password": "pass", "ftp_path": "/exports/products.csv", "columns": {"sku": "...", "title": "...", "price": "..."}}</code>
-                        </div>
-                    ]]></item>
-                </item>
-            </argument>
-            <settings>
-                <imports>
-                    <link name="visible">supplier_form.supplier_form.general.source_type:value</link>
-                </imports>
-            </settings>
-        </container>
-
-        <!-- Notice for HTTP type -->
-        <container name="http_notice_container" sortOrder="33">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="component" xsi:type="string">Magento_Ui/js/form/components/html</item>
-                    <item name="additionalClasses" xsi:type="string">admin__field-note</item>
-                    <item name="content" xsi:type="string" translate="true"><![CDATA[
-                        <div class="message message-notice">
-                            <strong>HTTP Type Configuration:</strong><br/>
-                            • Example: <code>{"http_url": "https://example.com/products.csv", "columns": {"sku": "...", "title": "...", "price": "..."}}</code>
-                        </div>
-                    ]]></item>
-                </item>
-            </argument>
-            <settings>
-                <imports>
-                    <link name="visible">supplier_form.supplier_form.general.source_type:value</link>
-                </imports>
-            </settings>
-        </container>
-
-        <field name="is_active" formElement="checkbox" sortOrder="40">
-            <settings>
-                <dataType>boolean</dataType>
-                <label translate="true">Is Active</label>
-                <dataScope>is_active</dataScope>
-            </settings>
-            <formElements>
-                <checkbox>
-                    <settings>
-                        <valueMap>
-                            <map name="false" xsi:type="number">0</map>
-                            <map name="true" xsi:type="number">1</map>
-                        </valueMap>
-                        <prefer>toggle</prefer>
-                    </settings>
-                </checkbox>
-            </formElements>
-        </field>
-
         <field name="source_config" formElement="textarea" sortOrder="50">
             <settings>
                 <dataType>text</dataType>
@@ -173,11 +90,15 @@
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
+                <additionalClasses>
+                    <class name="admin__field-note">true</class>
+                </additionalClasses>
             </settings>
             <formElements>
                 <textarea>
                     <settings>
                         <rows>10</rows>
+                        <notice translate="true">Configuration format depends on selected source type. All types require "columns" mapping (sku, title, price). LOCAL: Files in var/suppliers/ - Example: {"file_path": "file.csv", "columns": {...}}. FTP: {"ftp_host": "...", "ftp_port": 21, "ftp_username": "...", "ftp_password": "...", "ftp_path": "/file.csv", "columns": {...}}. HTTP: {"http_url": "https://...", "columns": {...}}. Custom parsers may require additional fields - check documentation.</notice>
                     </settings>
                 </textarea>
             </formElements>
