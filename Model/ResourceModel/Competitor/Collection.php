@@ -3,17 +3,19 @@ declare(strict_types=1);
 
 namespace Cyper\PriceIntelligent\Model\ResourceModel\Competitor;
 
-use Cyper\PriceIntelligent\Model\Competitor;
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Cyper\PriceIntelligent\Model\Competitor as CompetitorModel;
+use Cyper\PriceIntelligent\Model\ResourceModel\Competitor as CompetitorResource;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+class Collection extends AbstractCollection
 {
     /**
-     * Initialize resource collection
+     * Define resource model
      *
      * @return void
      */
-    public function _construct()
+    protected function _construct()
     {
-        $this->_init(Competitor::class, \Cyper\PriceIntelligent\Model\ResourceModel\Competitor::class);
+        $this->_init(CompetitorModel::class, CompetitorResource::class);
     }
 }

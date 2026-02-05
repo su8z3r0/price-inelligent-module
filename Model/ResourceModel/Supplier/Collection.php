@@ -13,7 +13,7 @@ class Collection extends AbstractCollection
      *
      * @return void
      */
-    public function _construct()
+    protected function _construct()
     {
         $this->_init(Supplier::class, \Cyper\PriceIntelligent\Model\ResourceModel\Supplier::class);
     }

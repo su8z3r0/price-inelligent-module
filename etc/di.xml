@@ -2,6 +2,18 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
     <preference for="Cyper\PriceIntelligent\Api\CrawlerInterface" type="Cyper\PriceIntelligent\Model\Service\Crawler"/>
+    <preference for="Cyper\PriceIntelligent\Api\PriceParserInterface" type="Cyper\PriceIntelligent\Model\Service\PriceParser"/>
+    <preference for="Cyper\PriceIntelligent\Api\ProxyRotatorInterface" type="Cyper\PriceIntelligent\Model\Service\ProxyRotator"/>
+
+    <!-- Repository Preferences -->
+    <preference for="Cyper\PriceIntelligent\Api\CompetitorRepositoryInterface" type="Cyper\PriceIntelligent\Repository\CompetitorRepository"/>
+    <preference for="Cyper\PriceIntelligent\Api\SupplierRepositoryInterface" type="Cyper\PriceIntelligent\Repository\SupplierRepository"/>
+    <preference for="Cyper\PriceIntelligent\Api\PriceComparisonsRepositoryInterface" type="Cyper\PriceIntelligent\Repository\PriceComparisonsRepository"/>
+
+    <!-- Data Interface Preferences -->
+    <preference for="Cyper\PriceIntelligent\Api\Data\CompetitorInterface" type="Cyper\PriceIntelligent\Model\Competitor"/>
+    <preference for="Cyper\PriceIntelligent\Api\Data\SupplierInterface" type="Cyper\PriceIntelligent\Model\Supplier"/>
+    <preference for="Cyper\PriceIntelligent\Api\Data\PriceComparisonsInterface" type="Cyper\PriceIntelligent\Model\PriceComparisons"/>
 
 
     <!-- Grid Collection for Listing -->
@@ -13,10 +25,70 @@
         </arguments>
     </virtualType>
 
+    <!-- Competitors Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\Competitor\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_competitors</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Competitor</argument>
+            <argument name="identifierName" xsi:type="string">competitor_id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Competitor Prices Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_competitor_prices</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Price Comparisons Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_price_comparisons</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Best Competitor Prices Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_best_competitor_prices</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Supplier Products Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\SupplierProducts\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_supplier_products</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\SupplierProducts</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Best Supplier Products Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_best_supplier_products</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="suppliers_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection</item>
+                <item name="cyper_suppliers_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection</item>
+                <item name="cyper_competitors_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Competitor\Grid\Collection</item>
+                <item name="cyper_competitor_prices_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\Grid\Collection</item>
+                <item name="cyper_price_comparisons_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons\Grid\Collection</item>
+                <item name="cyper_best_competitor_prices_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices\Grid\Collection</item>
+                <item name="cyper_supplier_products_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\SupplierProducts\Grid\Collection</item>
+                <item name="cyper_best_supplier_products_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts\Grid\Collection</item>
             </argument>
         </arguments>
     </type>
@@ -24,31 +96,53 @@
     <!-- Form DataProvider -->
     <type name="Cyper\PriceIntelligent\Ui\DataProvider\Supplier\Form\DataProvider">
         <arguments>
-            <argument name="name" xsi:type="string">suppliers_form_data_source</argument>
+            <argument name="name" xsi:type="string">cyper_supplier_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">supplier_id</argument>
             <argument name="requestFieldName" xsi:type="string">supplier_id</argument>
         </arguments>
     </type>
 
-    <!-- Parser Factory (Strategy Pattern) -->
-    <type name="Cyper\PriceIntelligent\Model\ParserFactory">
+    <type name="Cyper\PriceIntelligent\Ui\DataProvider\Competitor\Form\DataProvider">
+        <arguments>
+            <argument name="name" xsi:type="string">cyper_competitor_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">competitor_id</argument>
+            <argument name="requestFieldName" xsi:type="string">competitor_id</argument>
+        </arguments>
+    </type>
+
+
+    <!-- Parser Pool (Magento-style pattern) -->
+    <type name="Cyper\PriceIntelligent\Model\ParserPool">
         <arguments>
             <argument name="parsers" xsi:type="array">
                 <item name="local" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\LocalParser</item>
-                <item name="csv" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\CsvParser</item>
+                <item name="ftp" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\FtpParser</item>
                 <item name="http" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\HttpParser</item>
             </argument>
         </arguments>
     </type>
 
-    <!-- Source Types (auto-generated from parsers) -->
+    <!-- Source Type Configuration -->
     <type name="Cyper\PriceIntelligent\Model\Config\Source\SourceType">
         <arguments>
             <argument name="parserFactory" xsi:type="object">Cyper\PriceIntelligent\Model\ParserFactory</argument>
             <argument name="labels" xsi:type="array">
-                <item name="local" xsi:type="string">Local</item>
-                <item name="csv" xsi:type="string">CSV</item>
-                <item name="http" xsi:type="string">Http</item>
+                <item name="local" xsi:type="string">Local CSV</item>
+                <item name="ftp" xsi:type="string">FTP</item>
+                <item name="http" xsi:type="string">HTTP</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Console Commands Registration -->
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="crawler_scrape" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CrawlerScrapeCommand</item>
+                <item name="competitor_find_best" xsi:type="object">Cyper\PriceIntelligent\Console\Command\CompetitorFindBestCommand</item>
+                <item name="supplier_match" xsi:type="object">Cyper\PriceIntelligent\Console\Command\SupplierMatchCommand</item>
+                <item name="analysis_competitiveness" xsi:type="object">Cyper\PriceIntelligent\Console\Command\AnalysisCompetitivenessCommand</item>
+                <item name="update_proxies" xsi:type="object">Cyper\PriceIntelligent\Console\Command\UpdateProxiesCommand</item>
             </argument>
         </arguments>
     </type>
