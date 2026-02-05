@@ -114,6 +114,10 @@
                 <textarea>
                     <settings>
                         <rows>10</rows>
+                        <notice translate="true"><![CDATA[<strong>Local Type:</strong> Files must be placed in <code>var/suppliers/</code> directory.<br/>
+Example: <code>{"source_type": "local", "file_path": "supplier1.csv", "columns": {"sku": "codice", "title": "nome", "price": "prezzo"}}</code><br/><br/>
+<strong>FTP Type:</strong> <code>{"source_type": "ftp", "ftp_host": "...", "ftp_username": "...", "ftp_password": "...", "ftp_path": "/file.csv", "columns": {...}}</code><br/><br/>
+<strong>HTTP Type:</strong> <code>{"source_type": "http", "http_url": "https://...", "columns": {...}}</code>]]></notice>
                     </settings>
                 </textarea>
             </formElements>
