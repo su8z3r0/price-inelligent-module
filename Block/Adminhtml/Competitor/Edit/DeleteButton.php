@@ -4,11 +4,13 @@ declare(strict_types=1);
 namespace Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit;
 
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
+use Magento\Framework\UrlInterface;
 
 class DeleteButton implements ButtonProviderInterface
 {
     public function __construct(
-        private readonly \Magento\Framework\App\RequestInterface $request
+        private readonly \Magento\Framework\App\RequestInterface $request,
+        private readonly UrlInterface $urlBuilder
     ) {
     }
 
@@ -33,14 +35,9 @@ class DeleteButton implements ButtonProviderInterface
 
     private function getDeleteUrl(): string
     {
-        return sprintf(
-            "location.href = '%s'",
-            $this->getUrl('*/*/delete', ['competitor_id' => $this->request->getParam('competitor_id')])
+        return $this->urlBuilder->getUrl(
+            '*/*/delete',
+            ['competitor_id' => $this->request->getParam('competitor_id')]
         );
-    }
-
-    private function getUrl(string $route, array $params = []): string
-    {
-        return '';  // Will be replaced by real URL builder in context
     }
 }
