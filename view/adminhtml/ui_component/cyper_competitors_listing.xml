@@ -82,7 +82,7 @@
                 <label translate="true">Creato il</label>
             </settings>
         </column>
-        <actionsColumn name="actions" class="Magento\Ui\Component\Listing\Columns\Actions">
+        <actionsColumn name="actions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="urlPath" xsi:type="string">competitors/*/edit</item>
