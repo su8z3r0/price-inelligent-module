@@ -109,15 +109,12 @@
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
+                <notice translate="true">LOCAL TYPE: Files must be placed in var/suppliers/ directory. Example: {"source_type": "local", "file_path": "supplier1.csv", "columns": {"sku": "codice", "title": "nome", "price": "prezzo"}} | FTP TYPE: {"source_type": "ftp", "ftp_host": "...", "ftp_username": "...", "ftp_password": "...", "ftp_path": "/file.csv", "columns": {...}} | HTTP TYPE: {"source_type": "http", "http_url": "https://...", "columns": {...}}</notice>
             </settings>
             <formElements>
                 <textarea>
                     <settings>
                         <rows>10</rows>
-                        <notice translate="true"><![CDATA[<strong>Local Type:</strong> Files must be placed in <code>var/suppliers/</code> directory.<br/>
-Example: <code>{"source_type": "local", "file_path": "supplier1.csv", "columns": {"sku": "codice", "title": "nome", "price": "prezzo"}}</code><br/><br/>
-<strong>FTP Type:</strong> <code>{"source_type": "ftp", "ftp_host": "...", "ftp_username": "...", "ftp_password": "...", "ftp_path": "/file.csv", "columns": {...}}</code><br/><br/>
-<strong>HTTP Type:</strong> <code>{"source_type": "http", "http_url": "https://...", "columns": {...}}</code>]]></notice>
                     </settings>
                 </textarea>
             </formElements>
