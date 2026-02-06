@@ -4,14 +4,5 @@
         <route id="price_intelligent" frontName="price_intelligent">
             <module name="Cyper_PriceIntelligent" />
         </route>
-        <route id="competitors" frontName="competitors">
-            <module name="Cyper_PriceIntelligent" />
-        </route>
-        <route id="competitor_prices" frontName="competitor_prices">
-            <module name="Cyper_PriceIntelligent" />
-        </route>
-        <route id="price_comparisons" frontName="price_comparisons">
-            <module name="Cyper_PriceIntelligent" />
-        </route>
     </router>
 </config>

@@ -66,9 +66,17 @@
     <!-- Form DataProvider -->
     <type name="Cyper\PriceIntelligent\Ui\DataProvider\Supplier\Form\DataProvider">
         <arguments>
-            <argument name="name" xsi:type="string">suppliers_form_data_source</argument>
+            <argument name="name" xsi:type="string">cyper_supplier_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">supplier_id</argument>
             <argument name="requestFieldName" xsi:type="string">supplier_id</argument>
+        </arguments>
+    </type>
+
+    <type name="Cyper\PriceIntelligent\Ui\DataProvider\CompetitorDataProvider">
+        <arguments>
+            <argument name="name" xsi:type="string">cyper_competitor_form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">competitor_id</argument>
+            <argument name="requestFieldName" xsi:type="string">competitor_id</argument>
         </arguments>
     </type>
 
@@ -84,7 +92,7 @@
         </arguments>
     </type>
 
-    <!-- Source Type Labels Configuration -->
+    <!-- Source Type Configuration -->
     <type name="Cyper\PriceIntelligent\Model\Config\Source\SourceType">
         <arguments>
             <argument name="parserFactory" xsi:type="object">Cyper\PriceIntelligent\Model\ParserFactory</argument>
@@ -92,18 +100,6 @@
                 <item name="local" xsi:type="string">Local CSV</item>
                 <item name="ftp" xsi:type="string">FTP</item>
                 <item name="http" xsi:type="string">HTTP</item>
-            </argument>
-        </arguments>
-    </type>
-
-    <!-- Source Types (auto-generated from parsers) -->
-    <type name="Cyper\PriceIntelligent\Model\Config\Source\SourceType">
-        <arguments>
-            <argument name="parserFactory" xsi:type="object">Cyper\PriceIntelligent\Model\ParserFactory</argument>
-            <argument name="labels" xsi:type="array">
-                <item name="local" xsi:type="string">Local</item>
-                <item name="csv" xsi:type="string">CSV</item>
-                <item name="http" xsi:type="string">Http</item>
             </argument>
         </arguments>
     </type>
