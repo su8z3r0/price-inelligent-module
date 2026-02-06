@@ -85,7 +85,7 @@
         <actionsColumn name="actions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="urlPath" xsi:type="string">competitors/*/edit</item>
+                    <item name="urlPath" xsi:type="string">price_intelligent/competitors/edit</item>
                     <item name="urlEntityParamName" xsi:type="string">competitor_id</item>
                 </item>
             </argument>
