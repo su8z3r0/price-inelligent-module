@@ -140,7 +140,7 @@ class SupplierMatchCommand extends Command
             
             // Inserisci nuovi best prices
             $select = $connection->select()
-                ->from($supplierProductsTable, [
+                ->from(['main_table' => $supplierProductsTable], [
                     'sku',
                     'ean',
                     'normalized_sku',
