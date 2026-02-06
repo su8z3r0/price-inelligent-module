@@ -70,7 +70,7 @@
     </listingToolbar>
 
     <columns name="spinner_columns">
-        <selectionsColumn name="ids">
+        <selectionsColumn name="ids" sortOrder="1">
             <settings>
                 <indexField>supplier_id</indexField>
             </settings>
