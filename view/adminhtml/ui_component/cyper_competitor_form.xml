@@ -136,7 +136,6 @@
                 <textarea>
                     <settings>
                         <rows>15</rows>
-                        <notice translate="true">JSON configuration for scraping. Example: {"product_urls": ["..."], "selectors": {"sku": "...", "title": "...", "price": "..."}}</notice>
                     </settings>
                 </textarea>
             </formElements>

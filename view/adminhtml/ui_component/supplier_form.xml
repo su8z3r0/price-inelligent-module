@@ -15,8 +15,6 @@
             <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\SaveButton"/>
         </buttons>
         <namespace>supplier_form</namespace>
-        <ajaxSave>true</ajaxSave>
-        <ajaxSaveType>simple</ajaxSaveType>
         <dataScope>data</dataScope>
         <deps>
             <dep>supplier_form.supplier_form_data_source</dep>
@@ -98,7 +96,6 @@
                 <textarea>
                     <settings>
                         <rows>10</rows>
-                        <notice translate="true">Configuration format depends on selected source type. All types require "columns" mapping (sku, title, price). LOCAL: Files in var/suppliers/ - Example: {"file_path": "file.csv", "columns": {...}}. FTP: {"ftp_host": "...", "ftp_port": 21, "ftp_username": "...", "ftp_password": "...", "ftp_path": "/file.csv", "columns": {...}}. HTTP: {"http_url": "https://...", "columns": {...}}. Custom parsers may require additional fields - check documentation.</notice>
                     </settings>
                 </textarea>
             </formElements>
