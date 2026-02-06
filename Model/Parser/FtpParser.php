@@ -21,23 +21,25 @@ class FtpParser implements ParserInterface
 
     public function parse(array $config): array
     {
-        $requiredFields = ['ftp_host', 'ftp_username', 'ftp_password', 'ftp_path'];
-        foreach ($requiredFields as $field) {
-            if (!isset($config[$field])) {
-                throw new LocalizedException(__('%1 non specificato nella configurazione FTP', $field));
-            }
+        // Normalize config keys to support both prefixed and simple keys
+        $host = $config['ftp_host'] ?? $config['host'] ?? null;
+        $user = $config['ftp_username'] ?? $config['username'] ?? null;
+        $pass = $config['ftp_password'] ?? $config['password'] ?? null;
+        $path = $config['ftp_path'] ?? $config['path'] ?? null;
+        $port = $config['ftp_port'] ?? $config['port'] ?? 21;
+
+        if (!$host || !$user || !$pass || !$path) {
+            throw new LocalizedException(__('Parametri FTP mancanti (host, username, password, path)'));
         }
 
-        $port = $config['ftp_port'] ?? 21;
-        
         // Connessione FTP
-        $ftpConnection = ftp_connect($config['ftp_host'], $port);
+        $ftpConnection = ftp_connect($host, (int)$port);
         
         if (!$ftpConnection) {
-            throw new LocalizedException(__('Impossibile connettersi al server FTP: %1', $config['ftp_host']));
+            throw new LocalizedException(__('Impossibile connettersi al server FTP: %1', $host));
         }
 
-        $login = ftp_login($ftpConnection, $config['ftp_username'], $config['ftp_password']);
+        $login = ftp_login($ftpConnection, $user, $pass);
         
         if (!$login) {
             ftp_close($ftpConnection);
@@ -52,11 +54,11 @@ class FtpParser implements ParserInterface
             mkdir($tempDir, 0775, true);
         }
         
-        $localFile = $tempDir . '/ftp_' . basename($config['ftp_path']);
+        $localFile = $tempDir . '/ftp_' . basename($path);
         
-        if (!ftp_get($ftpConnection, $localFile, $config['ftp_path'], FTP_BINARY)) {
+        if (!ftp_get($ftpConnection, $localFile, $path, FTP_BINARY)) {
             ftp_close($ftpConnection);
-            throw new LocalizedException(__('Impossibile scaricare file FTP: %1', $config['ftp_path']));
+            throw new LocalizedException(__('Impossibile scaricare file FTP: %1', $path));
         }
 
         ftp_close($ftpConnection);

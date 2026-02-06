@@ -22,16 +22,18 @@ class HttpParser implements ParserInterface
 
     public function parse(array $config): array
     {
-        if (!isset($config['http_url'])) {
-            throw new LocalizedException(__('http_url non specificato nella configurazione'));
+        $url = $config['http_url'] ?? $config['url'] ?? null;
+
+        if (!$url) {
+            throw new LocalizedException(__('http_url (o url) non specificato nella configurazione'));
         }
 
         // Download CSV
         $this->curl->setTimeout(30);
-        $this->curl->get($config['http_url']);
+        $this->curl->get($url);
         
         if ($this->curl->getStatus() !== 200) {
-            throw new LocalizedException(__('Impossibile scaricare CSV da URL: %1 (HTTP %2)', $config['http_url'], $this->curl->getStatus()));
+            throw new LocalizedException(__('Impossibile scaricare CSV da URL: %1 (HTTP %2)', $url, $this->curl->getStatus()));
         }
 
         $csvContent = $this->curl->getBody();
@@ -42,7 +44,7 @@ class HttpParser implements ParserInterface
             mkdir($tempDir, 0775, true);
         }
         
-        $tempFile = $tempDir . '/http_' . md5($config['http_url']) . '.csv';
+        $tempFile = $tempDir . '/http_' . md5($url) . '.csv';
         file_put_contents($tempFile, $csvContent);
 
         // Parse CSV

@@ -20,12 +20,13 @@ class LocalParser implements ParserInterface
 
     public function parse(array $config): array
     {
-        if (!isset($config['file_path'])) {
-            throw new LocalizedException(__('file_path non specificato nella configurazione'));
+        $filePath = $config['file_path'] ?? $config['path'] ?? null;
+
+        if (!$filePath) {
+            throw new LocalizedException(__('file_path (o path) non specificato nella configurazione'));
         }
 
         // Supporta path assoluto o relativo a var/suppliers
-        $filePath = $config['file_path'];
         if (!str_starts_with($filePath, '/')) {
             $filePath = $this->directoryList->getPath('var') . '/suppliers/' . $filePath;
         }
