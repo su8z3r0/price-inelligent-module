@@ -8,6 +8,7 @@
              sortOrder="20"
              resource="Cyper_PriceIntelligent::price_intelligent"/>
 
+        <!-- Suppliers Section -->
         <add id="Cyper_PriceIntelligent::suppliers"
              title="Suppliers"
              translate="title"
@@ -17,6 +18,25 @@
              action="price_intelligent/suppliers/index"
              resource="Cyper_PriceIntelligent::suppliers"/>
 
+        <add id="Cyper_PriceIntelligent::supplier_products"
+             title="Supplier Products"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="11"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="price_intelligent/supplierproducts/index"
+             resource="Cyper_PriceIntelligent::supplier_products"/>
+
+        <add id="Cyper_PriceIntelligent::best_supplier_products"
+             title="Best Supplier Products"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="12"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="price_intelligent/bestsupplierproducts/index"
+             resource="Cyper_PriceIntelligent::best_supplier_products"/>
+
+        <!-- Competitors Section -->
         <add id="Cyper_PriceIntelligent::competitors"
              title="Competitors"
              translate="title"
@@ -27,19 +47,29 @@
              resource="Cyper_PriceIntelligent::competitors"/>
 
         <add id="Cyper_PriceIntelligent::competitor_prices"
-             title="Prezzi Competitor"
+             title="Competitor Prices"
              translate="title"
              module="Cyper_PriceIntelligent"
-             sortOrder="30"
+             sortOrder="21"
              parent="Cyper_PriceIntelligent::price_intelligent"
              action="price_intelligent/competitorprices/index"
              resource="Cyper_PriceIntelligent::competitor_prices"/>
 
-        <add id="Cyper_PriceIntelligent::price_comparisons"
-             title="Analisi Competitività"
+        <add id="Cyper_PriceIntelligent::best_competitor_prices"
+             title="Best Competitor Prices"
              translate="title"
              module="Cyper_PriceIntelligent"
-             sortOrder="40"
+             sortOrder="22"
+             parent="Cyper_PriceIntelligent::price_intelligent"
+             action="price_intelligent/bestcompetitorprices/index"
+             resource="Cyper_PriceIntelligent::best_competitor_prices"/>
+
+        <!-- Analysis Section -->
+        <add id="Cyper_PriceIntelligent::price_comparisons"
+             title="Price Comparisons"
+             translate="title"
+             module="Cyper_PriceIntelligent"
+             sortOrder="30"
              parent="Cyper_PriceIntelligent::price_intelligent"
              action="price_intelligent/pricecomparisons/index"
              resource="Cyper_PriceIntelligent::price_comparisons"/>

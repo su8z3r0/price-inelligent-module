@@ -52,6 +52,33 @@
         </arguments>
     </virtualType>
 
+    <!-- Best Competitor Prices Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_best_competitor_prices</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Supplier Products Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\SupplierProducts\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_supplier_products</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\SupplierProducts</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Best Supplier Products Grid Collection -->
+    <virtualType name="Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">cyper_best_supplier_products</argument>
+            <argument name="resourceModel" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts</argument>
+            <argument name="identifierName" xsi:type="string">id</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
@@ -59,6 +86,9 @@
                 <item name="cyper_competitors_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Competitor\Grid\Collection</item>
                 <item name="cyper_competitor_prices_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\Grid\Collection</item>
                 <item name="cyper_price_comparisons_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons\Grid\Collection</item>
+                <item name="cyper_best_competitor_prices_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices\Grid\Collection</item>
+                <item name="cyper_supplier_products_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\SupplierProducts\Grid\Collection</item>
+                <item name="cyper_best_supplier_products_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts\Grid\Collection</item>
             </argument>
         </arguments>
     </type>
