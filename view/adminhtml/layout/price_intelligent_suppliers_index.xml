@@ -3,7 +3,7 @@
     <update handle="styles"/>
     <body>
         <referenceContainer name="content">
-            <uiComponent name="suppliers_listing"/>
+            <uiComponent name="cyper_suppliers_listing"/>
         </referenceContainer>
     </body>
 </page>
