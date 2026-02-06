@@ -17,10 +17,10 @@
         </item>
     </argument>
 
-    <dataSource name="suppliers_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="cyper_suppliers_listing_data_source" component="Magento_Ui/js/grid/provider">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
-            <argument name="name" xsi:type="string">suppliers_listing_data_source</argument>
+            <argument name="name" xsi:type="string">cyper_suppliers_listing_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">supplier_id</argument>
             <argument name="requestFieldName" xsi:type="string">supplier_id</argument>
             <argument name="data" xsi:type="array">
