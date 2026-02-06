@@ -70,7 +70,7 @@
     </listingToolbar>
 
     <columns name="cyper_competitors_columns">
-        <selectionsColumn name="ids">
+        <selectionsColumn name="ids" sortOrder="1">
             <settings>
                 <indexField>competitor_id</indexField>
             </settings>
