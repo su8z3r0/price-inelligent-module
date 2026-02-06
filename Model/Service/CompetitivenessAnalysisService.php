@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Cyper\PriceIntelligent\Model\Service;
 
-use Cyper\PriceIntelligent\Model\PriceComparisons;
+use Cyper\PriceIntelligent\Api\PriceComparisonsRepositoryInterface;
+use Cyper\PriceIntelligent\Model\PriceComparisonsFactory;
 use Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts\CollectionFactory as BestSupplierCollectionFactory;
 use Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices\CollectionFactory as BestCompetitorCollectionFactory;
+use Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons as PriceComparisonsResource;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -14,7 +16,9 @@ class CompetitivenessAnalysisService
     public function __construct(
         private readonly BestSupplierCollectionFactory $bestSupplierCollectionFactory,
         private readonly BestCompetitorCollectionFactory $bestCompetitorCollectionFactory,
-        private readonly PriceComparisons $priceComparisonsFactory,
+        private readonly PriceComparisonsFactory $priceComparisonsFactory,
+        private readonly PriceComparisonsRepositoryInterface $priceComparisonsRepository,
+        private readonly PriceComparisonsResource $priceComparisonsResource,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -46,7 +50,7 @@ class CompetitivenessAnalysisService
         }
 
         // Cancella analisi precedenti
-        $connection = $this->priceComparisonsFactory->getResource()->getConnection();
+        $connection = $this->priceComparisonsResource->getConnection();
         $connection->truncateTable($connection->getTableName('cyper_price_comparisons'));
 
         $stats = [
@@ -73,7 +77,7 @@ class CompetitivenessAnalysisService
             $percentage = $theirPrice > 0 ? (($difference / $theirPrice) * 100) : 0;
 
             try {
-                $comparison = $this->priceComparisonsFactory;
+                $comparison = $this->priceComparisonsFactory->create();
                 $comparison->setData([
                     'sku' => $supplierProduct->getSku(),
                     'ean' => $supplierProduct->getEan(),
@@ -85,7 +89,7 @@ class CompetitivenessAnalysisService
                     'is_competitive' => $isCompetitive,
                     'competitiveness_percentage' => round($percentage, 2)
                 ]);
-                $comparison->save();
+                $this->priceComparisonsRepository->save($comparison);
 
                 $stats['total']++;
                 if ($isCompetitive) {

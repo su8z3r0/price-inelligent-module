@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Cyper\PriceIntelligent\Controller\Adminhtml\Competitors;
 
-use Cyper\PriceIntelligent\Model\CompetitorFactory;
+use Cyper\PriceIntelligent\Api\CompetitorRepositoryInterface;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Delete extends Action
 {
@@ -13,7 +14,7 @@ class Delete extends Action
 
     public function __construct(
         Context $context,
-        private readonly CompetitorFactory $competitorFactory
+        private readonly CompetitorRepositoryInterface $competitorRepository
     ) {
         parent::__construct($context);
     }
@@ -25,11 +26,10 @@ class Delete extends Action
 
         if ($id) {
             try {
-                $model = $this->competitorFactory->create();
-                $model->load($id);
-                $model->delete();
-                
+                $this->competitorRepository->deleteById((int)$id);
                 $this->messageManager->addSuccessMessage(__('Competitor eliminato.'));
+            } catch (NoSuchEntityException $e) {
+                $this->messageManager->addErrorMessage(__('Competitor non trovato.'));
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
             }

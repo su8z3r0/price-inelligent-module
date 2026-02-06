@@ -3,22 +3,22 @@ declare(strict_types=1);
 
 namespace Cyper\PriceIntelligent\Controller\Adminhtml\Suppliers;
 
+use Cyper\PriceIntelligent\Api\SupplierRepositoryInterface;
+use Cyper\PriceIntelligent\Model\SupplierFactory;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Cyper\PriceIntelligent\Model\SupplierFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Save extends Action
 {
     const ADMIN_RESOURCE = 'Cyper_PriceIntelligent::suppliers';
 
-    protected $supplierFactory;
-
     public function __construct(
         Context $context,
-        SupplierFactory $supplierFactory
+        private readonly SupplierFactory $supplierFactory,
+        private readonly SupplierRepositoryInterface $supplierRepository
     ) {
         parent::__construct($context);
-        $this->supplierFactory = $supplierFactory;
     }
 
     public function execute()
@@ -28,14 +28,16 @@ class Save extends Action
 
         if ($data) {
             $id = $this->getRequest()->getParam('supplier_id');
-            $model = $this->supplierFactory->create();
 
             if ($id) {
-                $model->load($id);
-                if (!$model->getId()) {
+                try {
+                    $model = $this->supplierRepository->getById((int)$id);
+                } catch (NoSuchEntityException $e) {
                     $this->messageManager->addErrorMessage(__('This supplier no longer exists.'));
                     return $resultRedirect->setPath('*/*/');
                 }
+            } else {
+                $model = $this->supplierFactory->create();
             }
 
             // Validate JSON
@@ -50,11 +52,11 @@ class Save extends Action
             $model->setData($data);
 
             try {
-                $model->save();
+                $this->supplierRepository->save($model);
                 $this->messageManager->addSuccessMessage(__('You saved the supplier.'));
 
                 if ($this->getRequest()->getParam('back')) {
-                    return $resultRedirect->setPath('*/*/edit', ['supplier_id' => $model->getId()]);
+                    return $resultRedirect->setPath('*/*/edit', ['supplier_id' => $model->getSupplierId()]);
                 }
                 return $resultRedirect->setPath('*/*/');
             } catch (\Exception $e) {

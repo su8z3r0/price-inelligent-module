@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Cyper\PriceIntelligent\Controller\Adminhtml\Competitors;
 
+use Cyper\PriceIntelligent\Api\CompetitorRepositoryInterface;
 use Cyper\PriceIntelligent\Model\CompetitorFactory;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Save extends Action
 {
@@ -13,7 +15,8 @@ class Save extends Action
 
     public function __construct(
         Context $context,
-        private readonly CompetitorFactory $competitorFactory
+        private readonly CompetitorFactory $competitorFactory,
+        private readonly CompetitorRepositoryInterface $competitorRepository
     ) {
         parent::__construct($context);
     }
@@ -28,14 +31,16 @@ class Save extends Action
         }
 
         $id = $this->getRequest()->getParam('competitor_id');
-        $model = $this->competitorFactory->create();
 
         if ($id) {
-            $model->load($id);
-            if (!$model->getId()) {
+            try {
+                $model = $this->competitorRepository->getById((int)$id);
+            } catch (NoSuchEntityException $e) {
                 $this->messageManager->addErrorMessage(__('Competitor non trovato.'));
                 return $resultRedirect->setPath('*/*/');
             }
+        } else {
+            $model = $this->competitorFactory->create();
         }
 
         // Decodifica crawler_config se è una stringa JSON
@@ -46,11 +51,11 @@ class Save extends Action
         $model->setData($data);
 
         try {
-            $model->save();
+            $this->competitorRepository->save($model);
             $this->messageManager->addSuccessMessage(__('Competitor salvato con successo.'));
             
             if ($this->getRequest()->getParam('back')) {
-                return $resultRedirect->setPath('*/*/edit', ['competitor_id' => $model->getId()]);
+                return $resultRedirect->setPath('*/*/edit', ['competitor_id' => $model->getCompetitorId()]);
             }
             
             return $resultRedirect->setPath('*/*/');
