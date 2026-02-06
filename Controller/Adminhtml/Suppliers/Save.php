@@ -42,10 +42,18 @@ class Save extends Action
 
             // Validate JSON
             if (isset($data['source_config'])) {
-                json_decode($data['source_config']);
+                $config = json_decode($data['source_config'], true);
+                
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     $this->messageManager->addErrorMessage(__('Invalid JSON in Source Config'));
                     return $resultRedirect->setPath('*/*/edit', ['supplier_id' => $id]);
+                }
+                
+                // Warn if parser_type is in config (should use source_type field instead)
+                if (isset($config['parser_type'])) {
+                    $this->messageManager->addWarningMessage(
+                        __('Note: "parser_type" in Source Config is ignored. Use the "Source Type" field instead.')
+                    );
                 }
             }
 

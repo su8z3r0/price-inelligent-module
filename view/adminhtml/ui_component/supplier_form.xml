@@ -88,9 +88,7 @@
                 <validation>
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
-                <additionalClasses>
-                    <class name="admin__field-note">true</class>
-                </additionalClasses>
+                <notice translate="true"><![CDATA[Configuration parameters for the selected source type. <strong>DO NOT include "parser_type"</strong> here (use the Source Type field above).<br/><br/><strong>Examples by type:</strong><br/><strong>CSV:</strong> {"file_path": "/path/to/file.csv", "delimiter": ",", "enclosure": "\""}<br/><strong>FTP:</strong> {"host": "ftp.example.com", "username": "user", "password": "pass", "path": "/data/products.csv"}<br/><strong>HTTP:</strong> {"url": "https://example.com/products.csv", "headers": {}}<br/><strong>Local:</strong> {"file_path": "var/import/products.csv"}]]></notice>
             </settings>
             <formElements>
                 <textarea>
