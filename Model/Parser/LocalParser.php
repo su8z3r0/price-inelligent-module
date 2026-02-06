@@ -34,7 +34,7 @@ class LocalParser implements ParserInterface
             throw new LocalizedException(__('File CSV non trovato: %1', $filePath));
         }
 
-        return $this->parseCSVFile($filePath, $config['columns'] ?? []);
+        return $this->parseCSVFile($filePath, $config);
     }
 
     public function getType(): string
@@ -45,15 +45,30 @@ class LocalParser implements ParserInterface
     /**
      * Parse CSV file with explicit column mapping or auto-normalization
      */
-    private function parseCSVFile(string $filePath, array $columnMapping): array
+    /**
+     * Parse CSV file with explicit column mapping or auto-normalization
+     */
+    private function parseCSVFile(string $filePath, array $config): array
     {
+        if (isset($config['delimiter'])) {
+            $this->csvProcessor->setDelimiter($config['delimiter']);
+        }
+        if (isset($config['enclosure'])) {
+            $this->csvProcessor->setEnclosure($config['enclosure']);
+        }
+
         $csvData = $this->csvProcessor->getData($filePath);
+        
+        // Reset defaults
+        $this->csvProcessor->setDelimiter(',');
+        $this->csvProcessor->setEnclosure('"');
         
         if (empty($csvData)) {
             return [];
         }
 
         $headers = array_shift($csvData);
+        $columnMapping = $config['columns'] ?? [];
         
         // Build index map from headers
         if (!empty($columnMapping)) {

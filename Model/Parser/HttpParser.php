@@ -46,7 +46,7 @@ class HttpParser implements ParserInterface
         file_put_contents($tempFile, $csvContent);
 
         // Parse CSV
-        $products = $this->parseCSVFile($tempFile, $config['columns'] ?? []);
+        $products = $this->parseCSVFile($tempFile, $config);
         
         // Clean up
         @unlink($tempFile);
@@ -62,15 +62,30 @@ class HttpParser implements ParserInterface
     /**
      * Parse CSV file
      */
-    private function parseCSVFile(string $filePath, array $columnMapping): array
+    /**
+     * Parse CSV file
+     */
+    private function parseCSVFile(string $filePath, array $config): array
     {
+        if (isset($config['delimiter'])) {
+            $this->csvProcessor->setDelimiter($config['delimiter']);
+        }
+        if (isset($config['enclosure'])) {
+            $this->csvProcessor->setEnclosure($config['enclosure']);
+        }
+
         $csvData = $this->csvProcessor->getData($filePath);
+
+        // Reset defaults
+        $this->csvProcessor->setDelimiter(',');
+        $this->csvProcessor->setEnclosure('"');
         
         if (empty($csvData)) {
             return [];
         }
 
         $headers = array_shift($csvData);
+        $columnMapping = $config['columns'] ?? [];
         
         if (!empty($columnMapping)) {
             $headerIndexMap = $this->buildExplicitMapping($headers, $columnMapping);
