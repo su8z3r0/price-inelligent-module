@@ -37,6 +37,15 @@ class SupplierActions extends Column
                 'href' => $this->urlBuilder->getUrl(self::URL_PATH_EDIT, ['supplier_id' => $item['supplier_id']]),
                 'label' => __('Edit'),
             ];
+
+            $item[$name]['delete'] = [
+                'href' => $this->urlBuilder->getUrl('price_intelligent/suppliers/delete', ['supplier_id' => $item['supplier_id']]),
+                'label' => __('Delete'),
+                'confirm' => [
+                    'title' => __('Delete Supplier'),
+                    'message' => __('Are you sure you want to delete this supplier?')
+                ]
+            ];
         }
 
         return $dataSource;
