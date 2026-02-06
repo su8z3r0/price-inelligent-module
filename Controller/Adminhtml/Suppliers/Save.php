@@ -57,6 +57,12 @@ class Save extends Action
                 }
             }
 
+            // Remove supplier_id from data if it's empty (for new suppliers)
+            // This prevents Magento from trying to UPDATE instead of INSERT
+            if (isset($data['supplier_id']) && empty($data['supplier_id'])) {
+                unset($data['supplier_id']);
+            }
+
             $model->setData($data);
 
             try {

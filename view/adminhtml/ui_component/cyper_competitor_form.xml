@@ -44,18 +44,7 @@
         <settings>
             <label translate="true">General Information</label>
         </settings>
-        <field name="competitor_id" formElement="input">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">competitor</item>
-                </item>
-            </argument>
-            <settings>
-                <dataType>text</dataType>
-                <visible>false</visible>
-                <dataScope>competitor_id</dataScope>
-            </settings>
-        </field>
+        </settings>
         <field name="name" sortOrder="10" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

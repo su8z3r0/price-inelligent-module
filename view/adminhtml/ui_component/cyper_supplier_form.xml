@@ -1,8 +1,8 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">supplier_form.supplier_form_data_source</item>
+            <item name="provider" xsi:type="string">cyper_supplier_form.supplier_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">Supplier Information</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
@@ -14,10 +14,10 @@
             <button name="delete" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\DeleteButton"/>
             <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\SaveButton"/>
         </buttons>
-        <namespace>supplier_form</namespace>
+        <namespace>cyper_supplier_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>supplier_form.supplier_form_data_source</dep>
+            <dep>cyper_supplier_form.supplier_form_data_source</dep>
         </deps>
     </settings>
 
@@ -42,14 +42,6 @@
         <settings>
             <label translate="true">General Information</label>
         </settings>
-
-        <field name="supplier_id" formElement="input">
-            <settings>
-                <dataType>text</dataType>
-                <visible>false</visible>
-                <dataScope>supplier_id</dataScope>
-            </settings>
-        </field>
 
         <field name="name" formElement="input" sortOrder="20">
             <settings>

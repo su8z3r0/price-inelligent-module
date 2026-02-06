@@ -48,6 +48,12 @@ class Save extends Action
             $data['crawler_config'] = json_decode($data['crawler_config'], true);
         }
 
+        // Remove competitor_id from data if it's empty (for new competitors)
+        // This prevents Magento from trying to UPDATE instead of INSERT
+        if (isset($data['competitor_id']) && empty($data['competitor_id'])) {
+            unset($data['competitor_id']);
+        }
+
         $model->setData($data);
 
         try {
