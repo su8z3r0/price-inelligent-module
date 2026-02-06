@@ -13,22 +13,7 @@ class PriceComparisons extends AbstractModel implements PriceComparisonsInterfac
         $this->_init(\Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons::class);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getId(): ?int
-    {
-        $id = $this->getData(self::ID);
-        return $id ? (int)$id : null;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setId(int $id): PriceComparisonsInterface
-    {
-        return $this->setData(self::ID, $id);
-    }
+    // getId() and setId() are inherited from AbstractModel
 
     /**
      * @inheritDoc

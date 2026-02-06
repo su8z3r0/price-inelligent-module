@@ -21,20 +21,7 @@ interface PriceComparisonsInterface
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-    /**
-     * Get ID
-     *
-     * @return int|null
-     */
-    public function getId(): ?int;
-
-    /**
-     * Set ID
-     *
-     * @param int $id
-     * @return $this
-     */
-    public function setId(int $id): self;
+    // getId() and setId() are inherited from AbstractModel
 
     /**
      * Get SKU
