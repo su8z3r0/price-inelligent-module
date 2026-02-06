@@ -36,7 +36,7 @@
         <settings>
             <submitUrl path="price_intelligent/competitors/save"/>
         </settings>
-        <dataProvider class="Cyper\PriceIntelligent\Ui\DataProvider\CompetitorDataProvider" name="cyper_competitor_form_data_source">
+        <dataProvider class="Cyper\PriceIntelligent\Ui\DataProvider\Competitor\Form\DataProvider" name="cyper_competitor_form_data_source">
             <settings>
                 <requestFieldName>competitor_id</requestFieldName>
                 <primaryFieldName>competitor_id</primaryFieldName>

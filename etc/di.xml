@@ -72,7 +72,7 @@
         </arguments>
     </type>
 
-    <type name="Cyper\PriceIntelligent\Ui\DataProvider\CompetitorDataProvider">
+    <type name="Cyper\PriceIntelligent\Ui\DataProvider\Competitor\Form\DataProvider">
         <arguments>
             <argument name="name" xsi:type="string">cyper_competitor_form_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">competitor_id</argument>
