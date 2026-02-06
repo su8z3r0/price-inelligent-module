@@ -34,7 +34,17 @@ class DataProvider extends AbstractDataProvider
 
         $items = $this->collection->getItems();
         foreach ($items as $supplier) {
-            $this->loadedData[$supplier->getId()] = $supplier->getData();
+            $data = $supplier->getData();
+            
+            // Pretty print JSON fields for better readability
+            if (isset($data['source_config']) && is_string($data['source_config'])) {
+                $decoded = json_decode($data['source_config'], true);
+                if ($decoded !== null) {
+                    $data['source_config'] = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                }
+            }
+            
+            $this->loadedData[$supplier->getId()] = $data;
         }
 
         // Return empty array for new records

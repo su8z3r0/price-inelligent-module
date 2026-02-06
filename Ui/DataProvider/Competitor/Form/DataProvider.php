@@ -34,7 +34,17 @@ class DataProvider extends AbstractDataProvider
 
         $items = $this->collection->getItems();
         foreach ($items as $competitor) {
-            $this->loadedData[$competitor->getId()] = $competitor->getData();
+            $data = $competitor->getData();
+            
+            // Pretty print JSON fields for better readability
+            if (isset($data['crawler_config']) && is_string($data['crawler_config'])) {
+                $decoded = json_decode($data['crawler_config'], true);
+                if ($decoded !== null) {
+                    $data['crawler_config'] = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                }
+            }
+            
+            $this->loadedData[$competitor->getId()] = $data;
         }
 
         // Return empty array for new records
