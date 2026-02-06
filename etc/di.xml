@@ -55,7 +55,7 @@
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
-                <item name="suppliers_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection</item>
+                <item name="cyper_suppliers_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Supplier\Grid\Collection</item>
                 <item name="cyper_competitors_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\Competitor\Grid\Collection</item>
                 <item name="cyper_competitor_prices_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\Grid\Collection</item>
                 <item name="cyper_price_comparisons_listing_data_source" xsi:type="string">Cyper\PriceIntelligent\Model\ResourceModel\PriceComparisons\Grid\Collection</item>
