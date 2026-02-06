@@ -23,7 +23,7 @@
              module="Cyper_PriceIntelligent"
              sortOrder="20"
              parent="Cyper_PriceIntelligent::price_intelligent"
-             action="competitors/competitors/index"
+             action="price_intelligent/competitors/index"
              resource="Cyper_PriceIntelligent::competitors"/>
 
         <add id="Cyper_PriceIntelligent::competitor_prices"
@@ -32,7 +32,7 @@
              module="Cyper_PriceIntelligent"
              sortOrder="30"
              parent="Cyper_PriceIntelligent::price_intelligent"
-             action="competitor_prices/competitorprices/index"
+             action="price_intelligent/competitorprices/index"
              resource="Cyper_PriceIntelligent::competitor_prices"/>
 
         <add id="Cyper_PriceIntelligent::price_comparisons"
@@ -41,7 +41,7 @@
              module="Cyper_PriceIntelligent"
              sortOrder="40"
              parent="Cyper_PriceIntelligent::price_intelligent"
-             action="price_comparisons/pricecomparisons/index"
+             action="price_intelligent/pricecomparisons/index"
              resource="Cyper_PriceIntelligent::price_comparisons"/>
     </menu>
 </config>
