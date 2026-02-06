@@ -5,6 +5,7 @@ namespace Cyper\PriceIntelligent\Repository;
 
 use Cyper\PriceIntelligent\Api\CompetitorRepositoryInterface;
 use Cyper\PriceIntelligent\Api\Data\CompetitorInterface;
+use Cyper\PriceIntelligent\Model\CompetitorFactory;
 use Cyper\PriceIntelligent\Model\ResourceModel\Competitor as CompetitorResource;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\CouldNotDeleteException;

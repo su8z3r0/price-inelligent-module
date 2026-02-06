@@ -5,6 +5,7 @@ namespace Cyper\PriceIntelligent\Repository;
 
 use Cyper\PriceIntelligent\Api\SupplierRepositoryInterface;
 use Cyper\PriceIntelligent\Api\Data\SupplierInterface;
+use Cyper\PriceIntelligent\Model\SupplierFactory;
 use Cyper\PriceIntelligent\Model\ResourceModel\Supplier as SupplierResource;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\CouldNotDeleteException;
