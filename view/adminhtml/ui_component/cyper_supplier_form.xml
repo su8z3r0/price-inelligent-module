@@ -2,7 +2,7 @@
 <form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">cyper_supplier_form.supplier_form_data_source</item>
+            <item name="provider" xsi:type="string">cyper_supplier_form.cyper_supplier_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">Supplier Information</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
@@ -17,11 +17,11 @@
         <namespace>cyper_supplier_form</namespace>
         <dataScope>data</dataScope>
         <deps>
-            <dep>cyper_supplier_form.supplier_form_data_source</dep>
+            <dep>cyper_supplier_form.cyper_supplier_form_data_source</dep>
         </deps>
     </settings>
 
-    <dataSource name="supplier_form_data_source">
+    <dataSource name="cyper_supplier_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
@@ -30,7 +30,7 @@
         <settings>
             <submitUrl path="price_intelligent/suppliers/save"/>
         </settings>
-        <dataProvider class="Cyper\PriceIntelligent\Ui\DataProvider\Supplier\Form\DataProvider" name="supplier_form_data_source">
+        <dataProvider class="Cyper\PriceIntelligent\Ui\DataProvider\Supplier\Form\DataProvider" name="cyper_supplier_form_data_source">
             <settings>
                 <requestFieldName>supplier_id</requestFieldName>
                 <primaryFieldName>supplier_id</primaryFieldName>
