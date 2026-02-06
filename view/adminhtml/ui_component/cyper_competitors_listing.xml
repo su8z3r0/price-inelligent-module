@@ -40,6 +40,33 @@
         <columnsControls name="columns_controls"/>
         <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Sei sicuro di voler eliminare gli elementi selezionati?</message>
+                        <title translate="true">Elimina elementi</title>
+                    </confirm>
+                    <url path="price_intelligent/competitors/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Elimina</label>
+                </settings>
+            </action>
+            <action name="enable">
+                <settings>
+                    <url path="price_intelligent/competitors/massStatus"/>
+                    <type>enable</type>
+                    <label translate="true">Attiva</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <url path="price_intelligent/competitors/massStatus"/>
+                    <type>disable</type>
+                    <label translate="true">Disattiva</label>
+                </settings>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="cyper_competitors_columns">
@@ -80,6 +107,13 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <label translate="true">Creato il</label>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Aggiornato il</label>
             </settings>
         </column>
         <actionsColumn name="actions" class="Cyper\PriceIntelligent\Ui\Component\Listing\Column\CompetitorActions">

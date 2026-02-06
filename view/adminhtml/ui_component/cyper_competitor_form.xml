@@ -18,6 +18,7 @@
                 <label translate="true">Back</label>
             </button>
             <button name="delete" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\DeleteButton"/>
+            <button name="save_and_continue" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\SaveAndContinueButton"/>
             <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\SaveButton"/>
         </buttons>
         <namespace>cyper_competitor_form</namespace>

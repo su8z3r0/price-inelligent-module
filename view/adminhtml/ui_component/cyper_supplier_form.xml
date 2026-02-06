@@ -12,6 +12,7 @@
         <buttons>
             <button name="back" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\BackButton"/>
             <button name="delete" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\DeleteButton"/>
+            <button name="save_and_continue" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\SaveAndContinueButton"/>
             <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Supplier\Edit\SaveButton"/>
         </buttons>
         <namespace>cyper_supplier_form</namespace>
