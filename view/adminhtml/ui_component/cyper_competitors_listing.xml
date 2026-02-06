@@ -82,7 +82,7 @@
                 <label translate="true">Creato il</label>
             </settings>
         </column>
-        <actionsColumn name="actions">
+        <actionsColumn name="actions" class="Cyper\PriceIntelligent\Ui\Component\Listing\Column\CompetitorActions">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="urlPath" xsi:type="string">price_intelligent/competitors/edit</item>
