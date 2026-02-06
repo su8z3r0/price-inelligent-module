@@ -6,6 +6,9 @@
         </item>
         <item name="label" xsi:type="string" translate="true">Competitor Information</item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="config" xsi:type="array">
+            <item name="ajaxSave" xsi:type="boolean">false</item>
+        </item>
     </argument>
     <settings>
         <buttons>
