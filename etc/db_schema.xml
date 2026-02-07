@@ -29,7 +29,6 @@
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="bigint" name="supplier_id" unsigned="true" nullable="false" comment="Supplier ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
@@ -49,9 +48,6 @@
         </index>
         <index referenceId="CYPER_SUPPLIER_PRODUCTS_SKU_INDEX" indexType="btree">
             <column name="sku"/>
-        </index>
-        <index referenceId="CYPER_SUPPLIER_PRODUCTS_EAN_INDEX" indexType="btree">
-            <column name="ean"/>
         </index>
         <index referenceId="CYPER_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
@@ -91,7 +87,6 @@
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="bigint" name="competitor_id" unsigned="true" nullable="false" comment="Competitor ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
@@ -113,9 +108,6 @@
         <index referenceId="CYPER_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
             <column name="sku"/>
         </index>
-        <index referenceId="CYPER_COMPETITOR_PRICES_EAN_INDEX" indexType="btree">
-            <column name="ean"/>
-        </index>
         <index referenceId="CYPER_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
         </index>
@@ -131,7 +123,6 @@
     <table name="cyper_price_comparisons" resource="default" engine="innodb" comment="Price Comparisons">
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="our_price" nullable="false" scale="2" precision="10" comment="Our Price"/>
@@ -148,9 +139,6 @@
 
         <index referenceId="CYPER_PRICE_COMPARISONS_SKU_INDEX" indexType="btree">
             <column name="sku"/>
-        </index>
-        <index referenceId="CYPER_PRICE_COMPARISONS_EAN_INDEX" indexType="btree">
-            <column name="ean"/>
         </index>
         <index referenceId="CYPER_PRICE_COMPARISONS_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
@@ -170,7 +158,6 @@
     <table name="cyper_best_supplier_products" resource="default" engine="innodb" comment="Best Supplier Products">
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
@@ -182,9 +169,7 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
-        <constraint xsi:type="unique" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_EAN_UNIQUE">
-            <column name="ean"/>
-        </constraint>
+
         <constraint xsi:type="foreign" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_WINNER_SUPPLIER_ID_CYPER_SUPPLIERS_SUPPLIER_ID"
                     table="cyper_best_supplier_products" column="winner_supplier_id" referenceTable="cyper_suppliers"
                     referenceColumn="supplier_id" onDelete="SET NULL"/>
@@ -207,7 +192,6 @@
     <table name="cyper_best_competitor_prices" resource="default" engine="innodb" comment="Best Competitor Prices">
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="13" comment="EAN-13 Code"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
@@ -218,9 +202,6 @@
 
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
-        </constraint>
-        <constraint xsi:type="unique" referenceId="CYPER_BEST_COMPETITOR_PRICES_EAN_UNIQUE">
-            <column name="ean"/>
         </constraint>
         <constraint xsi:type="foreign" referenceId="CYPER_BEST_COMPETITOR_PRICES_WINNER_COMPETITOR_ID_CYPER_COMPETITORS_COMPETITOR_ID"
                     table="cyper_best_competitor_prices" column="winner_competitor_id" referenceTable="cyper_competitors"

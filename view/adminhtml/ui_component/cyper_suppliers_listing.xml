@@ -1,10 +1,10 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">suppliers_listing.suppliers_listing_data_source</item>
-            <item name="deps" xsi:type="string">suppliers_listing.suppliers_listing_data_source</item>
+            <item name="provider" xsi:type="string">cyper_suppliers_listing.cyper_suppliers_listing_data_source</item>
+            <item name="deps" xsi:type="string">cyper_suppliers_listing.cyper_suppliers_listing_data_source</item>
         </item>
         <item name="spinner" xsi:type="string">spinner_columns</item>
         <item name="buttons" xsi:type="array">
@@ -17,10 +17,10 @@
         </item>
     </argument>
 
-    <dataSource name="suppliers_listing_data_source" component="Magento_Ui/js/grid/provider">
+    <dataSource name="cyper_suppliers_listing_data_source" component="Magento_Ui/js/grid/provider">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider</argument>
-            <argument name="name" xsi:type="string">suppliers_listing_data_source</argument>
+            <argument name="name" xsi:type="string">cyper_suppliers_listing_data_source</argument>
             <argument name="primaryFieldName" xsi:type="string">supplier_id</argument>
             <argument name="requestFieldName" xsi:type="string">supplier_id</argument>
             <argument name="data" xsi:type="array">
@@ -37,11 +37,44 @@
     <listingToolbar name="listing_top">
         <bookmark name="bookmarks"/>
         <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete selected items?</message>
+                        <title translate="true">Delete items</title>
+                    </confirm>
+                    <url path="price_intelligent/suppliers/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+            <action name="enable">
+                <settings>
+                    <url path="price_intelligent/suppliers/massStatus"/>
+                    <type>enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <url path="price_intelligent/suppliers/massStatus"/>
+                    <type>disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
 
     <columns name="spinner_columns">
+        <selectionsColumn name="ids" sortOrder="1">
+            <settings>
+                <indexField>supplier_id</indexField>
+            </settings>
+        </selectionsColumn>
         <column name="supplier_id" sortOrder="10">
             <settings>
                 <filter>text</filter>

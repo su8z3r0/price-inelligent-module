@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">cyper_competitor_form.cyper_competitor_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Competitor Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item name="config" xsi:type="array">
+            <item name="ajaxSave" xsi:type="boolean">false</item>
+        </item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back">
+                <url path="*/*/"/>
+                <class>back</class>
+                <label translate="true">Back</label>
+            </button>
+            <button name="delete" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\DeleteButton"/>
+            <button name="save_and_continue" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\SaveAndContinueButton"/>
+            <button name="save" class="Cyper\PriceIntelligent\Block\Adminhtml\Competitor\Edit\SaveButton"/>
+        </buttons>
+        <namespace>cyper_competitor_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>cyper_competitor_form.cyper_competitor_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="cyper_competitor_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="price_intelligent/competitors/save"/>
+        </settings>
+        <dataProvider class="Cyper\PriceIntelligent\Ui\DataProvider\Competitor\Form\DataProvider" name="cyper_competitor_form_data_source">
+            <settings>
+                <requestFieldName>competitor_id</requestFieldName>
+                <primaryFieldName>competitor_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General Information</label>
+        </settings>
+        <field name="name" sortOrder="10" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">competitor</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Name</label>
+                <dataScope>name</dataScope>
+            </settings>
+        </field>
+        <field name="website" sortOrder="20" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">competitor</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-url" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Website</label>
+                <dataScope>website</dataScope>
+            </settings>
+        </field>
+        <field name="is_active" sortOrder="30" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">competitor</item>
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Active</label>
+                <dataScope>is_active</dataScope>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="crawler_configuration">
+        <settings>
+            <label translate="true">Crawler Configuration</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+        </settings>
+        <field name="crawler_config" sortOrder="40" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">competitor</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Crawler Config (JSON)</label>
+                <dataScope>crawler_config</dataScope>
+            </settings>
+            <formElements>
+                <textarea>
+                    <settings>
+                        <rows>15</rows>
+                    </settings>
+                </textarea>
+            </formElements>
+        </field>
+    </fieldset>
+</form>
