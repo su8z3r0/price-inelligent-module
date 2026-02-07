@@ -130,7 +130,7 @@ class CrawlerScrapeCommand extends Command
 
     private function scrapeCompetitor(Competitor $competitor, OutputInterface $output): int
     {
-        $config = $competitor->getCrawlerConfig();
+        $config = $competitor->getScrapingConfig();
         
         if (!isset($config['product_urls'])) {
             throw new \InvalidArgumentException('Configurazione crawler mancante o invalida');

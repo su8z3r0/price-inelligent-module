@@ -11,7 +11,7 @@ interface CompetitorInterface
     const COMPETITOR_ID = 'competitor_id';
     const NAME = 'name';
     const WEBSITE_URL = 'website_url';
-    const SCRAPING_CONFIG = 'scraping_config';
+    const SCRAPING_CONFIG = 'crawler_config';
     const IS_ACTIVE = 'is_active';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
