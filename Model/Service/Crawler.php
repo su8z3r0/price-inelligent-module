@@ -7,6 +7,18 @@ use Cyper\PriceIntelligent\Api\CrawlerInterface;
 use Cyper\PriceIntelligent\Api\PriceParserInterface;
 use Cyper\PriceIntelligent\Api\ProxyRotatorInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Psr\Log\LoggerInterface;
+
+class Crawler implements CrawlerInterface
+{
+    private const CONFIG_PATH_MAX_RETRIES = 'price_intelligent/proxy/max_retries';
+
+    protected $logger;
+    protected $priceParser;
+    protected $proxyRotator;
+    protected $scopeConfig;
+
     public function __construct(
         LoggerInterface $logger,
         PriceParserInterface $priceParser,
