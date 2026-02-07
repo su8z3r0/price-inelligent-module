@@ -52,6 +52,10 @@ class Crawler implements CrawlerInterface
                 // Configure CURL
                 $curl->setTimeout(30);
                 $curl->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+                $curl->setOption(CURLOPT_HEADER, 0);
+                // Disable cookie persistence to avoid "Request Headers Too Long"
+                $curl->setOption(CURLOPT_COOKIEJAR, ''); 
+                $curl->setOption(CURLOPT_COOKIEFILE, '');
                 
                 // Set proxy if available
                 if ($proxy) {
