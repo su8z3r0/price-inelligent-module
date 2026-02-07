@@ -57,9 +57,23 @@ class Crawler implements CrawlerInterface
                 curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
                 
                 // Headers & User Agent
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-                // Explicitly disable Expect header which can cause issues
-                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Expect:']);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+                
+                $headers = [
+                    'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                    'Accept-Language: it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
+                    'Cache-Control: max-age=0',
+                    'Upgrade-Insecure-Requests: 1',
+                    'Sec-Fetch-Dest: document',
+                    'Sec-Fetch-Mode: navigate',
+                    'Sec-Fetch-Site: none',
+                    'Sec-Fetch-User: ?1',
+                    'Connection: close' // Prevent lingering connections
+                ];
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                
+                // Enable automatic decompression (gzip, deflate, br)
+                curl_setopt($ch, CURLOPT_ENCODING, ''); 
                 
                 // Enable request header tracking for debugging
                 curl_setopt($ch, CURLINFO_HEADER_OUT, true);
