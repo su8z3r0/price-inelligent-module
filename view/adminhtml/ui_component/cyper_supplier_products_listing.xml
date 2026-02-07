@@ -62,7 +62,7 @@
                 <label translate="true">EAN</label>
             </settings>
         </column>
-        <column name="product_title">
+        <column name="title">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Product Title</label>
