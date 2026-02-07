@@ -42,6 +42,22 @@ class SupplierImportService
 
         $imported = 0;
         foreach ($products as $productData) {
+            // Se SKU manca ma EAN c'è, usa EAN come SKU
+            if (empty($productData['sku']) && !empty($productData['ean'])) {
+                $productData['sku'] = $productData['ean'];
+            }
+            
+            // Trim whitespace
+            $productData['sku'] = trim((string)$productData['sku']);
+            if (isset($productData['ean'])) {
+                $productData['ean'] = trim((string)$productData['ean']);
+            }
+
+            // Skip se SKU è ancora vuoto dopo il fallback
+            if (empty($productData['sku'])) {
+                continue;
+            }
+
             try {
                 $this->saveProduct($supplier, $productData);
                 $imported++;
