@@ -41,7 +41,7 @@ class CompetitivenessAnalysisService
         // Indicizza competitor prices per SKU/EAN
         $competitorIndex = [];
         foreach ($competitorPrices as $competitorPrice) {
-            $key = $competitorPrice->getEan() ?: $competitorPrice->getNormalizedSku();
+            $key = $competitorPrice->getNormalizedSku();
             $competitorIndex[$key] = $competitorPrice;
         }
 
@@ -60,7 +60,7 @@ class CompetitivenessAnalysisService
         ];
 
         foreach ($supplierProducts as $supplierProduct) {
-            $key = $supplierProduct->getEan() ?: $supplierProduct->getNormalizedSku();
+            $key = $supplierProduct->getNormalizedSku();
             
             if (!isset($competitorIndex[$key])) {
                 continue; // Nessun competitor per questo prodotto
@@ -80,7 +80,6 @@ class CompetitivenessAnalysisService
                 $comparison = $this->priceComparisonsFactory->create();
                 $comparison->setData([
                     'sku' => $supplierProduct->getSku(),
-                    'ean' => $supplierProduct->getEan(),
                     'normalized_sku' => $supplierProduct->getNormalizedSku(),
                     'product_title' => $supplierProduct->getTitle(),
                     'our_price' => $ourPrice,
