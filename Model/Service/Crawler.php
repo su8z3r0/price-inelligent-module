@@ -60,9 +60,12 @@ class Crawler implements CrawlerInterface
                 curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
                 // Explicitly disable Expect header which can cause issues
                 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Expect:']);
+                
+                // Enable request header tracking for debugging
+                curl_setopt($ch, CURLINFO_HEADER_OUT, true);
 
-                // Note: We are deliberately NOT setting CURLOPT_COOKIEJAR/COOKIEFILE
-                // to prevent cookie accumulation loops which cause HTTP 400.
+                // Note: REMOVED CURLOPT_COOKIEJAR/COOKIEFILE to completely disable cookie engine.
+                // This prevents "Request Header Too Long" caused by cookie accumulation on redirects.
                 
                 // Proxy Configuration
                 if ($proxy) {
@@ -77,19 +80,23 @@ class Crawler implements CrawlerInterface
                 $error = curl_error($ch);
                 $errno = curl_errno($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $requestHeaders = curl_getinfo($ch, CURLINFO_HEADER_OUT);
                 
                 curl_close($ch);
                 $ch = null;
 
                 if ($errno || $html === false) {
+                    $this->logger->error('CURL Request Headers: ' . $requestHeaders);
                     throw new \RuntimeException('CURL Error: ' . $error);
                 }
 
                 if ($httpCode >= 400) {
+                    $this->logger->error('CURL Request Headers (HTTP ' . $httpCode . '): ' . $requestHeaders);
                     throw new \RuntimeException('HTTP Error: ' . $httpCode);
                 }
                 
                 if (empty($html)) {
+                    $this->logger->error('CURL Request Headers (Empty Response): ' . $requestHeaders);
                     throw new \RuntimeException('Empty response from server');
                 }
                 
