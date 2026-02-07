@@ -50,12 +50,7 @@
                 <label translate="true">SKU</label>
             </settings>
         </column>
-        <column name="ean">
-            <settings>
-                <filter>text</filter>
-                <label translate="true">EAN</label>
-            </settings>
-        </column>
+
         <column name="product_title">
             <settings>
                 <filter>text</filter>
