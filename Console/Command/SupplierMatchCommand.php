@@ -142,14 +142,13 @@ class SupplierMatchCommand extends Command
             $select = $connection->select()
                 ->from(['main_table' => $supplierProductsTable], [
                     'sku',
-                    'ean',
                     'normalized_sku',
                     'title',
                     'price' => new \Zend_Db_Expr('MIN(price)'),
                     'winner_supplier_id' => new \Zend_Db_Expr('(
                         SELECT supplier_id 
                         FROM ' . $supplierProductsTable . ' AS sub
-                        WHERE COALESCE(sub.ean, sub.sku) = COALESCE(main_table.ean, main_table.sku)
+                        WHERE sub.sku = main_table.sku
                         ORDER BY sub.price ASC 
                         LIMIT 1
                     )'),
@@ -159,7 +158,7 @@ class SupplierMatchCommand extends Command
                         WHERE s.supplier_id = (
                             SELECT supplier_id 
                             FROM ' . $supplierProductsTable . ' AS sub
-                            WHERE COALESCE(sub.ean, sub.sku) = COALESCE(main_table.ean, main_table.sku)
+                            WHERE sub.sku = main_table.sku
                             ORDER BY sub.price ASC 
                             LIMIT 1
                         )
@@ -167,11 +166,11 @@ class SupplierMatchCommand extends Command
                     'created_at' => new \Zend_Db_Expr('NOW()'),
                     'updated_at' => new \Zend_Db_Expr('NOW()')
                 ])
-                ->group('COALESCE(ean, sku)');
+                ->group('sku');
             
             $connection->query(
                 $connection->insertFromSelect($select, $bestTable, [
-                    'sku', 'ean', 'normalized_sku', 'title', 'price', 
+                    'sku', 'normalized_sku', 'title', 'price', 
                     'winner_supplier_id', 'winner_supplier_name', 
                     'created_at', 'updated_at'
                 ])
