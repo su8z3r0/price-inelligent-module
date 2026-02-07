@@ -7,7 +7,7 @@ use Cyper\PriceIntelligent\Api\CrawlerInterface;
 use Cyper\PriceIntelligent\Api\PriceParserInterface;
 use Cyper\PriceIntelligent\Api\ProxyRotatorInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
-use Magento\Framework\HTTP\Client\Curl;
+use Magento\Framework\HTTP\Client\CurlFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Psr\Log\LoggerInterface;
 
@@ -15,20 +15,20 @@ class Crawler implements CrawlerInterface
 {
     private const CONFIG_PATH_MAX_RETRIES = 'price_intelligent/proxy/max_retries';
 
-    protected $curl;
+    protected $curlFactory;
     protected $logger;
     protected $priceParser;
     protected $proxyRotator;
     protected $scopeConfig;
 
     public function __construct(
-        Curl $curl,
+        CurlFactory $curlFactory,
         LoggerInterface $logger,
         PriceParserInterface $priceParser,
         ProxyRotatorInterface $proxyRotator,
         ScopeConfigInterface $scopeConfig
     ) {
-        $this->curl = $curl;
+        $this->curlFactory = $curlFactory;
         $this->logger = $logger;
         $this->priceParser = $priceParser;
         $this->proxyRotator = $proxyRotator;
@@ -46,21 +46,24 @@ class Crawler implements CrawlerInterface
                 // Get proxy if enabled
                 $proxy = $this->proxyRotator->getNextProxy();
                 
+                /** @var \Magento\Framework\HTTP\Client\Curl $curl */
+                $curl = $this->curlFactory->create();
+
                 // Configure CURL
-                $this->curl->setTimeout(30);
-                $this->curl->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+                $curl->setTimeout(30);
+                $curl->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
                 
                 // Set proxy if available
                 if ($proxy) {
-                    $this->curl->setOption(CURLOPT_PROXY, $proxy['url']);
+                    $curl->setOption(CURLOPT_PROXY, $proxy['url']);
                     if (!empty($proxy['username']) && !empty($proxy['password'])) {
-                        $this->curl->setOption(CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
+                        $curl->setOption(CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
                     }
                     $this->logger->info('Scraping with proxy: ' . $proxy['url']);
                 }
                 
-                $this->curl->get($url);
-                $html = $this->curl->getBody();
+                $curl->get($url);
+                $html = $curl->getBody();
                 
                 // Check if we got valid HTML
                 if (empty($html)) {
