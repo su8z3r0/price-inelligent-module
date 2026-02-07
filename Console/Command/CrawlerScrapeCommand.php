@@ -150,7 +150,6 @@ class CrawlerScrapeCommand extends Command
                     $competitorPrice->setData([
                         'competitor_id' => $competitor->getId(),
                         'sku' => $productData['ean'] ?? 'UNKNOWN',
-                        'ean' => $productData['ean'],
                         'normalized_sku' => $this->normalizeSku($productData['ean'] ?? ''),
                         'product_title' => $productData['product_title'],
                         'sale_price' => $productData['sale_price'],
