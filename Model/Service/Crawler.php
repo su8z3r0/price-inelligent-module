@@ -7,28 +7,12 @@ use Cyper\PriceIntelligent\Api\CrawlerInterface;
 use Cyper\PriceIntelligent\Api\PriceParserInterface;
 use Cyper\PriceIntelligent\Api\ProxyRotatorInterface;
 use Symfony\Component\DomCrawler\Crawler as DomCrawler;
-use Magento\Framework\HTTP\Client\CurlFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Psr\Log\LoggerInterface;
-
-class Crawler implements CrawlerInterface
-{
-    private const CONFIG_PATH_MAX_RETRIES = 'price_intelligent/proxy/max_retries';
-
-    protected $curlFactory;
-    protected $logger;
-    protected $priceParser;
-    protected $proxyRotator;
-    protected $scopeConfig;
-
     public function __construct(
-        CurlFactory $curlFactory,
         LoggerInterface $logger,
         PriceParserInterface $priceParser,
         ProxyRotatorInterface $proxyRotator,
         ScopeConfigInterface $scopeConfig
     ) {
-        $this->curlFactory = $curlFactory;
         $this->logger = $logger;
         $this->priceParser = $priceParser;
         $this->proxyRotator = $proxyRotator;
@@ -42,34 +26,57 @@ class Crawler implements CrawlerInterface
         $lastException = null;
 
         while ($attempt < $maxRetries) {
+            $ch = null;
             try {
                 // Get proxy if enabled
                 $proxy = $this->proxyRotator->getNextProxy();
                 
-                /** @var \Magento\Framework\HTTP\Client\Curl $curl */
-                $curl = $this->curlFactory->create();
-
-                // Configure CURL
-                $curl->setTimeout(30);
-                $curl->setOption(CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-                $curl->setOption(CURLOPT_HEADER, 0);
-                // Disable cookie persistence to avoid "Request Headers Too Long"
-                $curl->setOption(CURLOPT_COOKIEJAR, ''); 
-                $curl->setOption(CURLOPT_COOKIEFILE, '');
+                $ch = curl_init();
                 
-                // Set proxy if available
+                // Generic Options
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_MAXREDIRS, 5); // Prevent infinite loops
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                
+                // Connection hygiene
+                curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+                curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+                
+                // Headers & User Agent
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+                // Explicitly disable Expect header which can cause issues
+                curl_setopt($ch, CURLOPT_HTTPHEADER, ['Expect:']);
+
+                // Note: We are deliberately NOT setting CURLOPT_COOKIEJAR/COOKIEFILE
+                // to prevent cookie accumulation loops which cause HTTP 400.
+                
+                // Proxy Configuration
                 if ($proxy) {
-                    $curl->setOption(CURLOPT_PROXY, $proxy['url']);
+                    curl_setopt($ch, CURLOPT_PROXY, $proxy['url']);
                     if (!empty($proxy['username']) && !empty($proxy['password'])) {
-                        $curl->setOption(CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
+                        curl_setopt($ch, CURLOPT_PROXYUSERPWD, $proxy['username'] . ':' . $proxy['password']);
                     }
                     $this->logger->info('Scraping with proxy: ' . $proxy['url']);
                 }
                 
-                $curl->get($url);
-                $html = $curl->getBody();
+                $html = curl_exec($ch);
+                $error = curl_error($ch);
+                $errno = curl_errno($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 
-                // Check if we got valid HTML
+                curl_close($ch);
+                $ch = null;
+
+                if ($errno || $html === false) {
+                    throw new \RuntimeException('CURL Error: ' . $error);
+                }
+
+                if ($httpCode >= 400) {
+                    throw new \RuntimeException('HTTP Error: ' . $httpCode);
+                }
+                
                 if (empty($html)) {
                     throw new \RuntimeException('Empty response from server');
                 }
@@ -85,6 +92,9 @@ class Crawler implements CrawlerInterface
                 ];
                 
             } catch (\Exception $e) {
+                if ($ch) {
+                    curl_close($ch);
+                }
                 $lastException = $e;
                 $attempt++;
                 
