@@ -132,22 +132,53 @@ class Crawler implements CrawlerInterface
         try {
             $scripts = $crawler->filter('script[type="application/ld+json"]');
             foreach ($scripts as $script) {
-                $data = json_decode($script->textContent, true);
-
-                if (isset($data[$field])) {
-                    return $data[$field];
+                $content = trim($script->textContent);
+                if (empty($content)) {
+                    continue;
                 }
 
-                if (isset($data['@graph'])) {
-                    foreach ($data['@graph'] as $item) {
-                        if (($item['@type'] ?? '') === 'Product' && isset($item[$field])) {
-                            return $item[$field];
-                        }
-                    }
+                $data = json_decode($content, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    continue;
+                }
+
+                $result = $this->findFieldRecursive($data, $field);
+                if ($result) {
+                    return (string)$result;
                 }
             }
         } catch (\Exception $e) {
             $this->logger->warning('JSON-LD extraction failed: ' . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    private function findFieldRecursive(array $data, string $field): ?string
+    {
+        // Direct match
+        if (isset($data[$field]) && (is_string($data[$field]) || is_numeric($data[$field]))) {
+            return (string)$data[$field];
+        }
+
+        // Handle @graph
+        if (isset($data['@graph']) && is_array($data['@graph'])) {
+            foreach ($data['@graph'] as $item) {
+                if (is_array($item)) {
+                    $result = $this->findFieldRecursive($item, $field);
+                    if ($result) return $result;
+                }
+            }
+        }
+
+        // Handle array of items (e.g. valid JSON-LD can be specific list of objects)
+        if (array_keys($data) === range(0, count($data) - 1)) {
+            foreach ($data as $item) {
+                if (is_array($item)) {
+                    $result = $this->findFieldRecursive($item, $field);
+                    if ($result) return $result;
+                }
+            }
         }
 
         return null;
