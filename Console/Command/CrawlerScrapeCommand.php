@@ -27,9 +27,63 @@ class CrawlerScrapeCommand extends Command
         private readonly CompetitorPrices $competitorPricesFactory,
         private readonly State $state,
         private readonly LoggerInterface $logger,
+        private readonly \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         string $name = null
     ) {
         parent::__construct($name);
+    }
+
+    // ... (previous methods unchanged)
+
+    private function scrapeCompetitor(Competitor $competitor, OutputInterface $output): int
+    {
+        $config = $competitor->getScrapingConfig();
+        
+        if (!isset($config['product_urls'])) {
+            throw new \InvalidArgumentException('Configurazione crawler mancante o invalida');
+        }
+
+        $productUrls = $config['product_urls'];
+        $count = 0;
+        
+        // Determine delay based on proxy usage
+        $proxiesEnabled = $this->scopeConfig->isSetFlag('price_intelligent/proxy/enabled');
+        $delay = $proxiesEnabled ? 2 : self::RATE_LIMIT_SECONDS;
+
+        foreach ($productUrls as $url) {
+            try {
+                $output->writeln("<comment>Scraping: {$url}</comment>");
+                
+                $productData = $this->crawler->scrapeProduct($config, $url);
+
+                if ($productData) {
+                    $competitorPrice = $this->competitorPricesFactory;
+                    $competitorPrice->setData([
+                        'competitor_id' => $competitor->getId(),
+                        'sku' => $productData['ean'] ?? 'UNKNOWN',
+                        'normalized_sku' => $this->normalizeSku($productData['ean'] ?? ''),
+                        'product_title' => $productData['product_title'],
+                        'sale_price' => $productData['sale_price'],
+                        'product_url' => $productData['product_url'],
+                        'scraped_at' => date('Y-m-d H:i:s')
+                    ]);
+                    $competitorPrice->save();
+                    $count++;
+                }
+
+                // Rate limiting
+                if ($delay > 0) {
+                    $output->writeln("<comment>Attesa {$delay} secondi...</comment>");
+                    sleep($delay);
+                }
+
+            } catch (\Exception $e) {
+                $output->writeln("<error>Errore su {$url}: {$e->getMessage()}</error>");
+                continue;
+            }
+        }
+
+        return $count;
     }
 
     protected function configure(): void
@@ -128,50 +182,7 @@ class CrawlerScrapeCommand extends Command
         return Cli::RETURN_SUCCESS;
     }
 
-    private function scrapeCompetitor(Competitor $competitor, OutputInterface $output): int
-    {
-        $config = $competitor->getScrapingConfig();
-        
-        if (!isset($config['product_urls'])) {
-            throw new \InvalidArgumentException('Configurazione crawler mancante o invalida');
-        }
 
-        $productUrls = $config['product_urls'];
-        $count = 0;
-
-        foreach ($productUrls as $url) {
-            try {
-                $output->writeln("<comment>Scraping: {$url}</comment>");
-                
-                $productData = $this->crawler->scrapeProduct($config, $url);
-
-                if ($productData) {
-                    $competitorPrice = $this->competitorPricesFactory;
-                    $competitorPrice->setData([
-                        'competitor_id' => $competitor->getId(),
-                        'sku' => $productData['ean'] ?? 'UNKNOWN',
-                        'normalized_sku' => $this->normalizeSku($productData['ean'] ?? ''),
-                        'product_title' => $productData['product_title'],
-                        'sale_price' => $productData['sale_price'],
-                        'product_url' => $productData['product_url'],
-                        'scraped_at' => date('Y-m-d H:i:s')
-                    ]);
-                    $competitorPrice->save();
-                    $count++;
-                }
-
-                // Rate limiting
-                $output->writeln('<comment>Attesa 60 secondi...</comment>');
-                sleep(self::RATE_LIMIT_SECONDS);
-
-            } catch (\Exception $e) {
-                $output->writeln("<error>Errore su {$url}: {$e->getMessage()}</error>");
-                continue;
-            }
-        }
-
-        return $count;
-    }
 
     private function normalizeSku(string $sku): string
     {
