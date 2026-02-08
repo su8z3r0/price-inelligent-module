@@ -87,6 +87,7 @@
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="bigint" name="competitor_id" unsigned="true" nullable="false" comment="Competitor ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
@@ -107,6 +108,9 @@
         </index>
         <index referenceId="CYPER_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
             <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
         </index>
         <index referenceId="CYPER_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
@@ -192,6 +196,7 @@
     <table name="cyper_best_competitor_prices" resource="default" engine="innodb" comment="Best Competitor Prices">
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
@@ -209,6 +214,9 @@
 
         <index referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
             <column name="sku"/>
+        </index>
+        <index referenceId="CYPER_BEST_COMPETITOR_PRICES_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
         </index>
         <index referenceId="CYPER_BEST_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
