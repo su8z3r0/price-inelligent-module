@@ -124,6 +124,14 @@ class ProxyPool
         if (!in_array($proxyUrl, $this->failedProxies)) {
             $this->failedProxies[] = $proxyUrl;
             $this->logger->warning('Proxy marked as failed: ' . $proxyUrl);
+            
+            // Remove from provider cache
+            try {
+                $this->proxyProvider->removeProxy($proxyUrl);
+            } catch (\Exception $e) {
+                // Ignore if provider doesn't support removal or fails
+                $this->logger->warning('Could not remove proxy from provider: ' . $e->getMessage());
+            }
         }
     }
 

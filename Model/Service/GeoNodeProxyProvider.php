@@ -121,4 +121,40 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
             $this->logger->error('Failed to update proxies from GeoNode: ' . $e->getMessage());
         }
     }
+
+
+    public function removeProxy(string $proxyUrl): void
+    {
+        try {
+            $cachedProxies = $this->cache->load(self::CACHE_KEY);
+            if (!$cachedProxies) {
+                return;
+            }
+
+            $proxies = $this->serializer->unserialize($cachedProxies);
+            if (!is_array($proxies)) {
+                return;
+            }
+
+            $originalCount = count($proxies);
+            $proxies = array_filter($proxies, function ($proxy) use ($proxyUrl) {
+                return $proxy['url'] !== $proxyUrl;
+            });
+
+            if (count($proxies) < $originalCount) {
+                // Re-index array
+                $proxies = array_values($proxies);
+                
+                $this->cache->save(
+                    $this->serializer->serialize($proxies),
+                    self::CACHE_KEY,
+                    ['price_intelligent_proxies'],
+                    self::CACHE_LIFETIME
+                );
+                $this->logger->info('Removed failed proxy from cache: ' . $proxyUrl);
+            }
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to remove proxy from cache: ' . $e->getMessage());
+        }
+    }
 }

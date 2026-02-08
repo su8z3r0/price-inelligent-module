@@ -18,4 +18,12 @@ interface ProxyProviderInterface
      * @return void
      */
     public function updateProxies(): void;
+
+    /**
+     * Remove a specific proxy from the list (and cache/storage)
+     *
+     * @param string $proxyUrl
+     * @return void
+     */
+    public function removeProxy(string $proxyUrl): void;
 }
