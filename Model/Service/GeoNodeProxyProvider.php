@@ -23,7 +23,23 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
         private readonly \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {}
 
-    // ... (getProxies remains same)
+    public function getProxies(): array
+    {
+        $cachedProxies = $this->cache->load(self::CACHE_KEY);
+        if ($cachedProxies) {
+            try {
+                return $this->serializer->unserialize($cachedProxies);
+            } catch (\Exception $e) {
+                $this->logger->warning('Failed to unserialize cached proxies: ' . $e->getMessage());
+            }
+        }
+
+        // If no cache, try to update
+        $this->updateProxies();
+        
+        $cachedProxies = $this->cache->load(self::CACHE_KEY);
+        return $cachedProxies ? $this->serializer->unserialize($cachedProxies) : [];
+    }
 
     public function updateProxies(): void
     {
