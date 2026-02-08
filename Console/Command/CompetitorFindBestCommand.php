@@ -3,21 +3,14 @@ declare(strict_types=1);
 
 namespace Cyper\PriceIntelligent\Console\Command;
 
-use Cyper\PriceIntelligent\Model\BestCompetitorPrices;
+use Cyper\PriceIntelligent\Model\BestCompetitorPricesFactory;
 use Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\CollectionFactory as CompetitorPricesCollectionFactory;
-use Magento\Framework\App\Area;
-use Magento\Framework\App\State;
-use Magento\Framework\Console\Cli;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
+// ...
 class CompetitorFindBestCommand extends Command
 {
     public function __construct(
         private readonly CompetitorPricesCollectionFactory $competitorPricesCollectionFactory,
-        private readonly BestCompetitorPrices $bestCompetitorPricesFactory,
+        private readonly BestCompetitorPricesFactory $bestCompetitorPricesFactory,
         private readonly State $state,
         private readonly LoggerInterface $logger,
         string $name = null
@@ -68,7 +61,9 @@ class CompetitorFindBestCommand extends Command
             foreach ($collection as $item) {
                 try {
                     // Cancella record esistente per questo EAN/SKU
-                    $existingCollection = $this->bestCompetitorPricesFactory->getCollection();
+                    // Note: Factory::create() returns a model instance. getCollection() is on the model resource, not the factory directly usually.
+                    // Correct pattern: $factory->create()->getCollection()
+                    $existingCollection = $this->bestCompetitorPricesFactory->create()->getCollection();
                     if ($item->getEan()) {
                         $existingCollection->addFieldToFilter('ean', $item->getEan());
                     } else {
@@ -80,7 +75,7 @@ class CompetitorFindBestCommand extends Command
                     }
 
                     // Crea nuovo record
-                    $bestPrice = $this->bestCompetitorPricesFactory;
+                    $bestPrice = $this->bestCompetitorPricesFactory->create();
                     $bestPrice->setData([
                         'sku' => $item->getSku(),
                         'ean' => $item->getEan(),
@@ -88,7 +83,7 @@ class CompetitorFindBestCommand extends Command
                         'product_title' => $item->getProductTitle(),
                         'sale_price' => $item->getSalePrice(),
                         'winner_competitor_id' => $item->getWinnerCompetitorId(),
-                        'winner_competitor_name' => $this->getCompetitorName($item->getWinnerCompetitorId())
+                        'winner_competitor_name' => $this->getCompetitorName((int)$item->getWinnerCompetitorId())
                     ]);
                     $bestPrice->save();
                     

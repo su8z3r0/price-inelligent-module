@@ -5,15 +5,23 @@ namespace Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices;
 
 use Cyper\PriceIntelligent\Model\BestCompetitorPrices;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
-     * Initialize resource collection
+     * @var string
+     */
+    protected $_idFieldName = 'id';
+
+    /**
+     * Define resource model
      *
      * @return void
      */
-    public function _construct()
+    protected function _construct()
     {
-        $this->_init(BestCompetitorPrices::class, \Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices::class);
+        $this->_init(
+            \Cyper\PriceIntelligent\Model\BestCompetitorPrices::class,
+            \Cyper\PriceIntelligent\Model\ResourceModel\BestCompetitorPrices::class
+        );
     }
 }
