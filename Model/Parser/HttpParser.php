@@ -4,88 +4,182 @@ declare(strict_types=1);
 namespace Cyper\PriceIntelligent\Model\Parser;
 
 use Cyper\PriceIntelligent\Api\ParserInterface;
-use Cyper\PriceIntelligent\Api\SkuNormalizerInterface;
+use Cyper\PriceIntelligent\Api\PriceParserInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\File\Csv;
 use Magento\Framework\HTTP\Client\Curl;
-use Magento\Framework\Filesystem\DirectoryList;
 
 class HttpParser implements ParserInterface
 {
-    protected $skuNormalizer;
-    protected $curl;
-    protected $directoryList;
-
     public function __construct(
-        SkuNormalizerInterface $skuNormalizer,
-        Curl $curl,
-        DirectoryList $directoryList
+        private readonly DirectoryList $directoryList,
+        private readonly Curl $curl,
+        private readonly Csv $csvProcessor,
+        private readonly PriceParserInterface $priceParser
     ) {
-        $this->skuNormalizer = $skuNormalizer;
-        $this->curl = $curl;
-        $this->directoryList = $directoryList;
     }
 
     public function parse(array $config): array
     {
-        $url = $config['http_url'] ?? null;
+        $url = $config['http_url'] ?? $config['url'] ?? null;
+
         if (!$url) {
-            throw new \InvalidArgumentException('Missing HTTP URL');
+            throw new LocalizedException(__('http_url (o url) non specificato nella configurazione'));
         }
 
-        // Download to temp
-        $tempFile = $this->directoryList->getPath('tmp') . '/' . uniqid('supplier_') . '.csv';
-
+        // Download CSV
         $this->curl->setTimeout(30);
         $this->curl->get($url);
-
+        
         if ($this->curl->getStatus() !== 200) {
-            throw new \RuntimeException("HTTP download failed: {$url}");
+            throw new LocalizedException(__('Impossibile scaricare CSV da URL: %1 (HTTP %2)', $url, $this->curl->getStatus()));
         }
 
-        file_put_contents($tempFile, $this->curl->getBody());
-
-        // Parse downloaded file
-        $products = $this->parseFile($tempFile, $config);
-        unlink($tempFile);
-
-        return $products;
-    }
-
-    protected function parseFile(string $filePath, array $config): array
-    {
-        $products = [];
-        $handle = fopen($filePath, 'r');
-        $headers = fgetcsv($handle);
-
-        $columnMap = $config['columns'] ?? [];
-
-        while (($row = fgetcsv($handle)) !== false) {
-            $data = array_combine($headers, $row);
-            $products[] = $this->parseRow($data, $columnMap);
+        $csvContent = $this->curl->getBody();
+        
+        // Salva in temp directory
+        $tempDir = $this->directoryList->getPath('var') . '/tmp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0775, true);
         }
+        
+        $tempFile = $tempDir . '/http_' . md5($url) . '.csv';
+        file_put_contents($tempFile, $csvContent);
 
-        fclose($handle);
+        // Parse CSV
+        $products = $this->parseCSVFile($tempFile, $config);
+        
+        // Clean up
+        @unlink($tempFile);
+        
         return $products;
-    }
-
-    protected function parseRow(array $row, array $columnMap): array
-    {
-        $sku = $row[$columnMap['sku']] ?? '';
-        $title = $row[$columnMap['title']] ?? '';
-        $price = $row[$columnMap['price']] ?? 0;
-
-        $ean = (strlen($sku) === 13 && is_numeric($sku)) ? $sku : null;
-
-        return [
-            'sku' => $sku,
-            'ean' => $ean,
-            'normalized_sku' => $this->skuNormalizer->normalize($sku),
-            'title' => trim($title),
-            'price' => (float) str_replace(',', '.', $price),
-        ];
     }
 
     public function getType(): string
     {
         return 'http';
+    }
+
+    /**
+     * Parse CSV file
+     */
+    /**
+     * Parse CSV file
+     */
+    private function parseCSVFile(string $filePath, array $config): array
+    {
+        if (isset($config['delimiter'])) {
+            $this->csvProcessor->setDelimiter($config['delimiter']);
+        }
+        if (isset($config['enclosure'])) {
+            $this->csvProcessor->setEnclosure($config['enclosure']);
+        }
+
+        $csvData = $this->csvProcessor->getData($filePath);
+
+        // Reset defaults
+        $this->csvProcessor->setDelimiter(',');
+        $this->csvProcessor->setEnclosure('"');
+        
+        if (empty($csvData)) {
+            return [];
+        }
+
+        $headers = array_shift($csvData);
+        $columnMapping = $config['columns'] ?? [];
+        
+        if (!empty($columnMapping)) {
+            $headerIndexMap = $this->buildExplicitMapping($headers, $columnMapping);
+        } else {
+            $headerIndexMap = $this->buildAutoMapping($headers);
+        }
+
+        $products = [];
+        foreach ($csvData as $row) {
+            $product = $this->mapRow($headerIndexMap, $row);
+            if ($product) {
+                $products[] = $product;
+            }
+        }
+
+        return $products;
+    }
+
+    private function buildExplicitMapping(array $headers, array $columnMapping): array
+    {
+        $map = [];
+        
+        foreach ($headers as $index => $header) {
+            $normalizedHeader = strtolower(trim($header));
+            
+            foreach ($columnMapping as $field => $csvColumn) {
+                if (strtolower(trim($csvColumn)) === $normalizedHeader) {
+                    $map[$field] = $index;
+                    break;
+                }
+            }
+        }
+        
+        return $map;
+    }
+
+    private function buildAutoMapping(array $headers): array
+    {
+        $map = [];
+        
+        foreach ($headers as $index => $header) {
+            $normalized = $this->normalizeHeader(strtolower(trim($header)));
+            if ($normalized) {
+                $map[$normalized] = $index;
+            }
+        }
+        
+        return $map;
+    }
+
+    private function normalizeHeader(string $header): ?string
+    {
+        if (in_array($header, ['sku', 'codice', 'cod'])) {
+            return 'sku';
+        }
+        
+        if (in_array($header, ['titolo_prodotto', 'titolo', 'title'])) {
+            return 'title';
+        }
+        
+        if (in_array($header, ['prezzo', 'price', 'prezzo_vendita'])) {
+            return 'price';
+        }
+        
+        if (in_array($header, ['ean', 'ean13', 'barcode'])) {
+            return 'ean';
+        }
+        
+        return null;
+    }
+
+    private function mapRow(array $headerIndexMap, array $row): ?array
+    {
+        if (!isset($headerIndexMap['sku']) || !isset($headerIndexMap['title']) || !isset($headerIndexMap['price'])) {
+            return null;
+        }
+        
+        $product = [];
+        $product['sku'] = $row[$headerIndexMap['sku']] ?? null;
+        $product['title'] = $row[$headerIndexMap['title']] ?? null;
+        $priceText = $row[$headerIndexMap['price']] ?? null;
+        
+        if (!$product['sku'] || !$product['title'] || !$priceText) {
+            return null;
+        }
+        
+        $product['price'] = $this->priceParser->parse($priceText);
+        
+        if (isset($headerIndexMap['ean'])) {
+            $product['ean'] = $row[$headerIndexMap['ean']] ?? null;
+        }
+        
+        return $product;
     }
 }

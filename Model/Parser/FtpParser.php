@@ -9,10 +9,11 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\File\Csv;
 
-class LocalParser implements ParserInterface
+class FtpParser implements ParserInterface
 {
     public function __construct(
         private readonly DirectoryList $directoryList,
+        private readonly LocalParser $localParser,
         private readonly Csv $csvProcessor,
         private readonly PriceParserInterface $priceParser
     ) {
@@ -20,34 +21,67 @@ class LocalParser implements ParserInterface
 
     public function parse(array $config): array
     {
-        $filePath = $config['file_path'] ?? $config['path'] ?? null;
+        // Normalize config keys to support both prefixed and simple keys
+        $host = $config['ftp_host'] ?? $config['host'] ?? null;
+        $user = $config['ftp_username'] ?? $config['username'] ?? null;
+        $pass = $config['ftp_password'] ?? $config['password'] ?? null;
+        $path = $config['ftp_path'] ?? $config['path'] ?? null;
+        $port = $config['ftp_port'] ?? $config['port'] ?? 21;
 
-        if (!$filePath) {
-            throw new LocalizedException(__('file_path (o path) non specificato nella configurazione'));
+        if (!$host || !$user || !$pass || !$path) {
+            throw new LocalizedException(__('Parametri FTP mancanti (host, username, password, path)'));
         }
 
-        // Supporta path assoluto o relativo a var/suppliers
-        if (!str_starts_with($filePath, '/')) {
-            $filePath = $this->directoryList->getPath('var') . '/suppliers/' . $filePath;
+        // Connessione FTP
+        $ftpConnection = ftp_connect($host, (int)$port);
+        
+        if (!$ftpConnection) {
+            throw new LocalizedException(__('Impossibile connettersi al server FTP: %1', $host));
+        }
+
+        $login = ftp_login($ftpConnection, $user, $pass);
+        
+        if (!$login) {
+            ftp_close($ftpConnection);
+            throw new LocalizedException(__('Autenticazione FTP fallita'));
+        }
+
+        ftp_pasv($ftpConnection, true);
+
+        // Download file
+        $tempDir = $this->directoryList->getPath('var') . '/tmp';
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0775, true);
         }
         
-        if (!file_exists($filePath)) {
-            throw new LocalizedException(__('File CSV non trovato: %1', $filePath));
+        $localFile = $tempDir . '/ftp_' . basename($path);
+        
+        if (!ftp_get($ftpConnection, $localFile, $path, FTP_BINARY)) {
+            ftp_close($ftpConnection);
+            throw new LocalizedException(__('Impossibile scaricare file FTP: %1', $path));
         }
 
-        return $this->parseCSVFile($filePath, $config);
+        ftp_close($ftpConnection);
+
+        // Parse CSV usando lo stesso metodo del LocalParser
+        $products = $this->parseCSVFile($localFile, $config);
+        
+        // Clean up
+        @unlink($localFile);
+        
+        return $products;
     }
 
     public function getType(): string
     {
-        return 'local';
+        return 'ftp';
     }
 
     /**
-     * Parse CSV file with explicit column mapping or auto-normalization
+     * Parse CSV file (duplicato da LocalParser per consistenza)
      */
     /**
-     * Parse CSV file with explicit column mapping or auto-normalization
+     * Parse CSV file (duplicato da LocalParser per consistenza)
      */
     private function parseCSVFile(string $filePath, array $config): array
     {
@@ -59,7 +93,7 @@ class LocalParser implements ParserInterface
         }
 
         $csvData = $this->csvProcessor->getData($filePath);
-        
+
         // Reset defaults
         $this->csvProcessor->setDelimiter(',');
         $this->csvProcessor->setEnclosure('"');
@@ -71,7 +105,6 @@ class LocalParser implements ParserInterface
         $headers = array_shift($csvData);
         $columnMapping = $config['columns'] ?? [];
         
-        // Build index map from headers
         if (!empty($columnMapping)) {
             $headerIndexMap = $this->buildExplicitMapping($headers, $columnMapping);
         } else {
@@ -89,9 +122,6 @@ class LocalParser implements ParserInterface
         return $products;
     }
 
-    /**
-     * Build mapping from explicit config
-     */
     private function buildExplicitMapping(array $headers, array $columnMapping): array
     {
         $map = [];
@@ -110,9 +140,6 @@ class LocalParser implements ParserInterface
         return $map;
     }
 
-    /**
-     * Build mapping with auto-normalization
-     */
     private function buildAutoMapping(array $headers): array
     {
         $map = [];
@@ -127,9 +154,6 @@ class LocalParser implements ParserInterface
         return $map;
     }
 
-    /**
-     * Auto-normalize header
-     */
     private function normalizeHeader(string $header): ?string
     {
         if (in_array($header, ['sku', 'codice', 'cod'])) {
@@ -151,9 +175,6 @@ class LocalParser implements ParserInterface
         return null;
     }
 
-    /**
-     * Map CSV row to product
-     */
     private function mapRow(array $headerIndexMap, array $row): ?array
     {
         if (!isset($headerIndexMap['sku']) || !isset($headerIndexMap['title']) || !isset($headerIndexMap['price'])) {

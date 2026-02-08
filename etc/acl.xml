@@ -3,8 +3,14 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Cyper_PriceIntelligent::price_intelligent" title="Price Intelligent" sortOrder="20">
+                <resource id="Cyper_PriceIntelligent::price_intelligent" title="Price Intelligent" sortOrder="10">
                     <resource id="Cyper_PriceIntelligent::suppliers" title="Suppliers" sortOrder="10"/>
+                    <resource id="Cyper_PriceIntelligent::supplier_products" title="Supplier Products" sortOrder="11"/>
+                    <resource id="Cyper_PriceIntelligent::best_supplier_products" title="Best Supplier Products" sortOrder="12"/>
+                    <resource id="Cyper_PriceIntelligent::competitors" title="Competitors" sortOrder="20"/>
+                    <resource id="Cyper_PriceIntelligent::competitor_prices" title="Competitor Prices" sortOrder="21"/>
+                    <resource id="Cyper_PriceIntelligent::best_competitor_prices" title="Best Competitor Prices" sortOrder="22"/>
+                    <resource id="Cyper_PriceIntelligent::price_comparisons" title="Price Comparisons" sortOrder="30"/>
                 </resource>
             </resource>
         </resources>

@@ -4,27 +4,37 @@ declare(strict_types=1);
 namespace Cyper\PriceIntelligent\Model;
 
 use Cyper\PriceIntelligent\Api\ParserInterface;
+use Magento\Framework\Exception\LocalizedException;
 
+/**
+ * Factory for creating parsers via Pool
+ */
 class ParserFactory
 {
-    protected $parsers;
-
-    public function __construct(array $parsers = [])
-    {
-        $this->parsers = $parsers;
+    public function __construct(
+        private readonly ParserPool $parserPool
+    ) {
     }
 
-    public function create(string $type): ParserInterface
+    /**
+     * Create parser by type
+     *
+     * @param string $sourceType
+     * @return ParserInterface
+     * @throws LocalizedException
+     */
+    public function create(string $sourceType): ParserInterface
     {
-        if (!isset($this->parsers[$type])) {
-            throw new \InvalidArgumentException("Parser type '{$type}' not found");
-        }
-
-        return $this->parsers[$type];
+        return $this->parserPool->getParser($sourceType);
     }
 
+    /**
+     * Get all available parser types
+     *
+     * @return string[]
+     */
     public function getAvailableTypes(): array
     {
-        return array_keys($this->parsers);
+        return $this->parserPool->getAvailableTypes();
     }
 }
