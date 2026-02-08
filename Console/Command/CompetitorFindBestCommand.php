@@ -5,7 +5,13 @@ namespace Cyper\PriceIntelligent\Console\Command;
 
 use Cyper\PriceIntelligent\Model\BestCompetitorPricesFactory;
 use Cyper\PriceIntelligent\Model\ResourceModel\CompetitorPrices\CollectionFactory as CompetitorPricesCollectionFactory;
-// ...
+use Magento\Framework\App\Area;
+use Magento\Framework\App\State;
+use Magento\Framework\Console\Cli;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 class CompetitorFindBestCommand extends Command
 {
     public function __construct(
