@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
 
 class GeoNodeProxyProvider implements ProxyProviderInterface
 {
-    private const API_URL = 'https://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=lastChecked&sort_type=desc';
+    private const API_URL = 'https://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=latency&sort_type=asc&protocols=socks5,socks4&anonymityLevel=elite&anonymityLevel=anonymous';
     private const CACHE_KEY = 'cyper_price_intelligent_proxies';
     private const CACHE_LIFETIME = 3600; // 1 hour default
 
@@ -47,8 +47,8 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
             // Get max latency config (default: no limit)
             $maxLatency = (int)$this->scopeConfig->getValue('price_intelligent/proxy/max_latency');
             
-            // Add speed limit to API query if possible, or filter locally
-            // GeoNode API supports filter, but let's filter locally to be safe
+            // Fetch proxies from GeoNode
+            // Query optimized to return Low Latency, SOCKS, Elite/Anonymous proxies first
             $this->curl->get(self::API_URL);
             $response = $this->curl->getBody();
             
@@ -68,12 +68,23 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                     continue;
                 }
 
-                // Filter by Latency
-                // GeoNode typically provides 'latency' or 'speed'
-                $latency = $item['latency'] ?? $item['speed'] ?? 0;
-                
+                // SECURITY CHECK: Verify Anonymity
+                // Even though API filters it, double check to prevent leaks
+                $anonymity = strtolower($item['anonymityLevel'] ?? '');
+                if ($anonymity === 'transparent') {
+                    continue; 
+                }
+
+                // Filter by Latency (User Config)
+                $latency = $item['latency'] ?? $item['speed'] ?? 9999;
                 if ($maxLatency > 0 && $latency > $maxLatency) {
                     continue;
+                }
+                
+                // Filter by Uptime (Minimum 50% required to be considered reliable)
+                $uptime = $item['upTime'] ?? 0;
+                if ($uptime < 50) {
+                     continue;
                 }
 
                 // Prefer protocols in order: socks5, socks4, http
@@ -87,9 +98,10 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                 $proxies[] = [
                     'url' => $item['ip'] . ':' . $item['port'],
                     'protocol' => $protocol,
-                    'username' => null, // GeoNode free proxies are usually public
+                    'username' => null, 
                     'password' => null,
-                    'latency' => $latency // Store for reference
+                    'latency' => $latency,
+                    'anonymity' => $anonymity
                 ];
             }
 
@@ -100,9 +112,9 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                     ['price_intelligent_proxies'],
                     self::CACHE_LIFETIME
                 );
-                $this->logger->info('Updated proxy list with ' . count($proxies) . ' proxies from GeoNode (Max Latency: ' . ($maxLatency ?: 'Unlimited') . 'ms)');
+                $this->logger->info('Updated proxy list with ' . count($proxies) . ' Optimized Proxies (Latency < ' . ($maxLatency ?: 'Inf') . 'ms, SOCKS Only)');
             } else {
-                $this->logger->warning('No proxies found matching criteria (Max Latency: ' . $maxLatency . 'ms)');
+                $this->logger->warning('No optimized proxies found. Check API or Max Latency settings.');
             }
 
         } catch (\Exception $e) {
