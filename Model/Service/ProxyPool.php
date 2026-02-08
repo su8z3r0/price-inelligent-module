@@ -25,6 +25,10 @@ class ProxyPool
      */
     private function loadProxies(): void
     {
+        if (!$this->scopeConfig->isSetFlag('price_intelligent/proxy/enabled')) {
+            return;
+        }
+
         // Load from provider (GeoNode)
         try {
             $providerProxies = $this->proxyProvider->getProxies();

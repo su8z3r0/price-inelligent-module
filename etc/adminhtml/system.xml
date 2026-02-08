@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="cyper" translate="label" sortOrder="200">
+            <label>Cyper</label>
+        </tab>
+        <section id="price_intelligent" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Price Intelligent</label>
+            <tab>cyper</tab>
+            <resource>Cyper_PriceIntelligent::config</resource>
+            <group id="proxy" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Proxy Configuration</label>
+                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Proxy Rotation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="proxies" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Manual Proxy List</label>
+                    <comment><![CDATA[Format: url|username|password (one per line).<br/>Example: http://proxy.com:8080|user|pass]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
