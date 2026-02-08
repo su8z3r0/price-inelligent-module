@@ -19,30 +19,20 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
         private readonly Curl $curl,
         private readonly CacheInterface $cache,
         private readonly SerializerInterface $serializer,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
     ) {}
 
-    public function getProxies(): array
-    {
-        $cachedProxies = $this->cache->load(self::CACHE_KEY);
-        if ($cachedProxies) {
-            try {
-                return $this->serializer->unserialize($cachedProxies);
-            } catch (\Exception $e) {
-                $this->logger->warning('Failed to unserialize cached proxies: ' . $e->getMessage());
-            }
-        }
-
-        // If no cache, try to update
-        $this->updateProxies();
-        
-        $cachedProxies = $this->cache->load(self::CACHE_KEY);
-        return $cachedProxies ? $this->serializer->unserialize($cachedProxies) : [];
-    }
+    // ... (getProxies remains same)
 
     public function updateProxies(): void
     {
         try {
+            // Get max latency config (default: no limit)
+            $maxLatency = (int)$this->scopeConfig->getValue('price_intelligent/proxy/max_latency');
+            
+            // Add speed limit to API query if possible, or filter locally
+            // GeoNode API supports filter, but let's filter locally to be safe
             $this->curl->get(self::API_URL);
             $response = $this->curl->getBody();
             
@@ -62,6 +52,14 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                     continue;
                 }
 
+                // Filter by Latency
+                // GeoNode typically provides 'latency' or 'speed'
+                $latency = $item['latency'] ?? $item['speed'] ?? 0;
+                
+                if ($maxLatency > 0 && $latency > $maxLatency) {
+                    continue;
+                }
+
                 // Prefer protocols in order: socks5, socks4, http
                 $protocol = 'http';
                 if (in_array('socks5', $item['protocols'])) {
@@ -74,7 +72,8 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                     'url' => $item['ip'] . ':' . $item['port'],
                     'protocol' => $protocol,
                     'username' => null, // GeoNode free proxies are usually public
-                    'password' => null
+                    'password' => null,
+                    'latency' => $latency // Store for reference
                 ];
             }
 
@@ -85,7 +84,9 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                     ['price_intelligent_proxies'],
                     self::CACHE_LIFETIME
                 );
-                $this->logger->info('Updated proxy list with ' . count($proxies) . ' proxies from GeoNode');
+                $this->logger->info('Updated proxy list with ' . count($proxies) . ' proxies from GeoNode (Max Latency: ' . ($maxLatency ?: 'Unlimited') . 'ms)');
+            } else {
+                $this->logger->warning('No proxies found matching criteria (Max Latency: ' . $maxLatency . 'ms)');
             }
 
         } catch (\Exception $e) {

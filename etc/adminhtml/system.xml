@@ -19,6 +19,11 @@
                     <label>Manual Proxy List</label>
                     <comment><![CDATA[Format: url|username|password (one per line).<br/>Example: http://proxy.com:8080|user|pass]]></comment>
                 </field>
+                <field id="max_latency" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Latency (ms)</label>
+                    <comment>Maximum allowed latency for proxies (e.g. 500). Leave empty for no limit.</comment>
+                    <validate>validate-digits</validate>
+                </field>
             </group>
         </section>
     </system>
