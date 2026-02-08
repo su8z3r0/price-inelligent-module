@@ -43,38 +43,32 @@ class CompetitorFindBestCommand extends Command
         try {
             $collection = $this->competitorPricesCollectionFactory->create();
             
-            // Raggruppa per EAN (o SKU se EAN non disponibile)
+            // Raggruppa per SKU
             $collection->getSelect()
                 ->reset(\Magento\Framework\DB\Select::COLUMNS)
                 ->columns([
-                    'ean',
                     'sku',
                     'product_title',
                     'sale_price' => new \Zend_Db_Expr('MIN(sale_price)'),
                     'winner_competitor_id' => new \Zend_Db_Expr('(
                         SELECT competitor_id 
                         FROM ' . $collection->getMainTable() . ' AS sub
-                        WHERE sub.ean = main_table.ean 
-                        OR (sub.ean IS NULL AND sub.sku = main_table.sku)
+                        WHERE sub.sku = main_table.sku
                         ORDER BY sub.sale_price ASC 
                         LIMIT 1
                     )')
                 ])
-                ->group('COALESCE(ean, sku)');
+                ->group('sku');
 
             $processed = 0;
             
             foreach ($collection as $item) {
                 try {
-                    // Cancella record esistente per questo EAN/SKU
+                    // Cancella record esistente per questo SKU
                     // Note: Factory::create() returns a model instance. getCollection() is on the model resource, not the factory directly usually.
                     // Correct pattern: $factory->create()->getCollection()
                     $existingCollection = $this->bestCompetitorPricesFactory->create()->getCollection();
-                    if ($item->getEan()) {
-                        $existingCollection->addFieldToFilter('ean', $item->getEan());
-                    } else {
-                        $existingCollection->addFieldToFilter('sku', $item->getSku());
-                    }
+                    $existingCollection->addFieldToFilter('sku', $item->getSku());
                     
                     foreach ($existingCollection as $existing) {
                         $existing->delete();
@@ -84,8 +78,7 @@ class CompetitorFindBestCommand extends Command
                     $bestPrice = $this->bestCompetitorPricesFactory->create();
                     $bestPrice->setData([
                         'sku' => $item->getSku(),
-                        'ean' => $item->getEan(),
-                        'normalized_sku' => $this->normalizeSku($item->getEan() ?? $item->getSku()),
+                        'normalized_sku' => $this->normalizeSku($item->getSku()),
                         'product_title' => $item->getProductTitle(),
                         'sale_price' => $item->getSalePrice(),
                         'winner_competitor_id' => $item->getWinnerCompetitorId(),
