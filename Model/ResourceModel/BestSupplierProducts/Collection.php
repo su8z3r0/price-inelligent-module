@@ -5,7 +5,7 @@ namespace Cyper\PriceIntelligent\Model\ResourceModel\BestSupplierProducts;
 
 use Cyper\PriceIntelligent\Model\BestSupplierProducts;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
+class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
      * Initialize resource collection
