@@ -10,7 +10,7 @@
         <item name="buttons" xsi:type="array">
             <item name="add" xsi:type="array">
                 <item name="name" xsi:type="string">add</item>
-                <item name="label" xsi:type="string" translate="true">Aggiungi Competitor</item>
+                <item name="label" xsi:type="string" translate="true">Add Competitor</item>
                 <item name="class" xsi:type="string">primary</item>
                 <item name="url" xsi:type="string">*/*/new</item>
             </item>
@@ -43,26 +43,26 @@
             <action name="delete">
                 <settings>
                     <confirm>
-                        <message translate="true">Sei sicuro di voler eliminare gli elementi selezionati?</message>
-                        <title translate="true">Elimina elementi</title>
+                        <message translate="true">Are you sure you want to delete selected items?</message>
+                        <title translate="true">Delete items</title>
                     </confirm>
                     <url path="price_intelligent/competitors/massDelete"/>
                     <type>delete</type>
-                    <label translate="true">Elimina</label>
+                    <label translate="true">Delete</label>
                 </settings>
             </action>
             <action name="enable">
                 <settings>
                     <url path="price_intelligent/competitors/massStatus"/>
                     <type>enable</type>
-                    <label translate="true">Attiva</label>
+                    <label translate="true">Enable</label>
                 </settings>
             </action>
             <action name="disable">
                 <settings>
                     <url path="price_intelligent/competitors/massStatus"/>
                     <type>disable</type>
-                    <label translate="true">Disattiva</label>
+                    <label translate="true">Disable</label>
                 </settings>
             </action>
         </massaction>
@@ -86,7 +86,7 @@
         <column name="name" sortOrder="20">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Nome</label>
+                <label translate="true">Name</label>
             </settings>
         </column>
 
@@ -100,7 +100,7 @@
         <column name="is_active" sortOrder="40" component="Magento_Ui/js/grid/columns/select">
             <settings>
                 <filter>select</filter>
-                <label translate="true">Attivo</label>
+                <label translate="true">Active</label>
                 <options class="Magento\Config\Model\Config\Source\Yesno"/>
                 <dataType>select</dataType>
             </settings>
@@ -109,7 +109,7 @@
         <column name="created_at" sortOrder="50" class="Magento\Ui\Component\Listing\Columns\Date">
             <settings>
                 <filter>dateRange</filter>
-                <label translate="true">Creato il</label>
+                <label translate="true">Created</label>
                 <dataType>date</dataType>
             </settings>
         </column>
@@ -117,7 +117,7 @@
         <column name="updated_at" sortOrder="60" class="Magento\Ui\Component\Listing\Columns\Date">
             <settings>
                 <filter>dateRange</filter>
-                <label translate="true">Aggiornato il</label>
+                <label translate="true">Updated</label>
                 <dataType>date</dataType>
             </settings>
         </column>

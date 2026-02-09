@@ -54,25 +54,25 @@
         <column name="product_title">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Prodotto</label>
+                <label translate="true">Product</label>
             </settings>
         </column>
         <column name="our_price">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">Nostro Prezzo</label>
+                <label translate="true">Our Price</label>
             </settings>
         </column>
         <column name="competitor_price">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">Prezzo Competitor</label>
+                <label translate="true">Competitor Price</label>
             </settings>
         </column>
         <column name="price_difference">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">Differenza</label>
+                <label translate="true">Difference</label>
             </settings>
         </column>
         <column name="is_competitive" component="Magento_Ui/js/grid/columns/select">
@@ -80,14 +80,14 @@
                 <options class="Magento\Config\Model\Config\Source\Yesno"/>
                 <filter>select</filter>
                 <dataType>select</dataType>
-                <label translate="true">Competitivo</label>
+                <label translate="true">Competitive</label>
                 <bodyTmpl>ui/grid/cells/html</bodyTmpl>
             </settings>
         </column>
         <column name="competitiveness_percentage">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">% Competitività</label>
+                <label translate="true">Competitiveness %</label>
             </settings>
         </column>
     </columns>

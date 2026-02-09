@@ -36,7 +36,7 @@ class Save extends Action
             try {
                 $model = $this->competitorRepository->getById((int)$id);
             } catch (NoSuchEntityException $e) {
-                $this->messageManager->addErrorMessage(__('Competitor non trovato.'));
+                $this->messageManager->addErrorMessage(__('Competitor not found.'));
                 return $resultRedirect->setPath('*/*/');
             }
         } else {
@@ -58,7 +58,7 @@ class Save extends Action
 
         try {
             $this->competitorRepository->save($model);
-            $this->messageManager->addSuccessMessage(__('Competitor salvato con successo.'));
+            $this->messageManager->addSuccessMessage(__('Competitor saved successfully.'));
             
             if ($this->getRequest()->getParam('back')) {
                 return $resultRedirect->setPath('*/*/edit', ['competitor_id' => $model->getCompetitorId()]);

@@ -27,9 +27,9 @@ class Delete extends Action
         if ($id) {
             try {
                 $this->competitorRepository->deleteById((int)$id);
-                $this->messageManager->addSuccessMessage(__('Competitor eliminato.'));
+                $this->messageManager->addSuccessMessage(__('Competitor deleted.'));
             } catch (NoSuchEntityException $e) {
-                $this->messageManager->addErrorMessage(__('Competitor non trovato.'));
+                $this->messageManager->addErrorMessage(__('Competitor not found.'));
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
             }
