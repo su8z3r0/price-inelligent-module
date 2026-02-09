@@ -1,79 +1,64 @@
-# Price Intelligent - Magento 2 Module
+# Price Intelligent - Modulo Magento 2
 
-Modulo Magento 2 per il monitoraggio dei prezzi dei competitor e l'analisi della competitività.
+Modulo avanzato per il monitoraggio dei prezzi dei competitor, l'importazione dei listini fornitori e l'analisi della competitività dei prezzi.
 
 ## 📋 Indice
 
-- [Caratteristiche](#caratteristiche)
-- [Requisiti](#requisiti)
+- [Caratteristiche Principali](#caratteristiche-principali)
+- [Requisiti di Sistema](#requisiti-di-sistema)
 - [Installazione](#installazione)
 - [Configurazione](#configurazione)
 - [Utilizzo](#utilizzo)
+  - [Gestione Competitor](#gestione-competitor)
+  - [Gestione Fornitori](#gestione-fornitori)
+  - [Analisi Prezzi](#analisi-prezzi)
 - [Comandi Console](#comandi-console)
-- [Struttura Modulo](#struttura-modulo)
-- [API & Estensibilità](#api--estensibilità)
+- [Struttura e Estensibilità](#struttura-e-estensibilità)
 
 ---
 
-## ✨ Caratteristiche
+## ✨ Caratteristiche Principali
 
 ### 🔍 Scraping Competitor
-- Scraping automatico prezzi competitor
-- Rate limiting configurabile
-- Supporto proxy rotation per evitare ban
-- Estrazione intelligente EAN (JSON-LD, meta tags, data attributes)
-- Retry logic con failover automatico
+- **Monitoraggio Prezzi**: Estrazione automatica dei prezzi dai siti competitor.
+- **Proxy Rotation**: Supporto nativo per rotazione proxy per evitare blocchi IP.
+- **Estrazione Intelligente**: Supporta selettori CSS, Meta Tags (OpenGraph), JSON-LD e Data Attributes per trovare EAN e Prezzi.
+- **Rate Limiting**: Configurazione dei ritardi tra le richieste per simulare il comportamento umano.
 
 ### 📊 Gestione Fornitori
-- Import prodotti da CSV (Local, FTP, HTTP)
-- Normalizzazione automatica header CSV
-- Matching prodotti tramite SKU/EAN
-- Parsing intelligente prezzi (formati EU/US)
+- **Importazione Multi-Sorgente**: Supporta file CSV locali, remoti via FTP e HTTP.
+- **Mapping Flessibile**: Mappatura personalizzabile delle colonne CSV per ogni fornitore tramite configurazione JSON.
+- **Normalizzazione Automatica**: Riconoscimento automatico degli header standard (es. `sku`, `price`, `ean`).
 
 ### 📈 Analisi Competitività
-- Confronto prezzi fornitore vs competitor
-- Calcolo differenza e percentuale
-- Identificazione best price per SKU/EAN
-- Dashboard admin con export CSV
-
-### 🔄 Proxy Rotation
-- Rotazione automatica proxy (round-robin/random)
-- Health check e failover
-- Configurabile via admin
-- Retry configurabile
+- **Confronto Diretto**: Dashboard dedicata per confrontare i tuoi prezzi di acquisto/vendita con i competitor.
+- **Best Price**: Identificazione automatica del miglior prezzo sul mercato per SKU.
+- **Reportistica**: Visualizzazione immediata della differenza di prezzo e percentuale di competitività.
 
 ---
 
-## 📦 Requisiti
+## 📦 Requisiti di Sistema
 
 - **Magento**: 2.4.x
-- **PHP**: 8.1+
-- **Composer packages**:
-  - `symfony/dom-crawler`
-  - `symfony/console`
+- **PHP**: 8.1 o superiore
+- **Librerie Richieste**:
+  - `symfony/dom-crawler`: Per il parsing HTML
+  - `symfony/css-selector`: Per i selettori CSS
 
 ---
 
 ## 🚀 Installazione
 
-### 1. Clona il Repository
+### 1. Copia i file del modulo
+Copia il modulo nella directory `app/code/Cyper/PriceIntelligent`.
 
+### 2. Installa le dipendenze
+Esegui il comando composer dalla root di Magento:
 ```bash
-cd <magento_root>/app/code
-mkdir -p Cyper
-cd Cyper
-git clone https://github.com/su8z3r0/price-inelligent-module.git PriceIntelligent
+composer require symfony/dom-crawler symfony/css-selector
 ```
 
-### 2. Installa Dipendenze
-
-```bash
-cd <magento_root>
-composer require symfony/dom-crawler
-```
-
-### 3. Abilita il Modulo
-
+### 3. Abilita il modulo
 ```bash
 php bin/magento module:enable Cyper_PriceIntelligent
 php bin/magento setup:upgrade
@@ -81,542 +66,121 @@ php bin/magento setup:di:compile
 php bin/magento cache:flush
 ```
 
-### 4. Crea Directory per CSV
-
-```bash
-mkdir -p var/suppliers
-chmod 775 var/suppliers
-```
-
 ---
 
 ## ⚙️ Configurazione
 
-### Admin Panel
+### Configurazione Generale
+Vai su **Stores > Configuration > Cyper > Price Intelligent**.
 
-**Percorso**: `Stores > Configuration > Price Intelligent`
-
-#### Proxy Settings
-
-```
-Enabled: Yes/No
-Strategy: round_robin | random
-Max Retries: 3
-Proxies: (formato: url|username|password)
-```
-
-**Esempio Configurazione Proxy**:
-```
-http://proxy1.example.com:8080|user1|pass1
-http://proxy2.example.com:8080
-socks5://proxy3.example.com:1080|user3|pass3
-```
-
-### Database Schema
-
-Il modulo crea automaticamente queste tabelle:
-
-- `cyper_competitors` - Competitor e configurazioni scraping
-- `cyper_competitor_prices` - Prezzi scraped
-- `cyper_suppliers` - Fornitori
-- `cyper_supplier_products` - Prodotti fornitori
-- `cyper_price_comparisons` - Analisi competitività
+#### Proxy Configuration
+Configura qui i proxy per lo scraping:
+- **Enable Proxy Rotation**: `Yes` / `No`
+- **Manual Proxy List**: Inserisci i proxy nel formato `url|username|password` (uno per riga).
+  - Esempio: `http://proxy.example.com:8080|user|pass`
+- **Max Latency**: Tempo massimo in ms (opzionale).
 
 ---
 
 ## 📖 Utilizzo
 
-### 1. Aggiungi Competitor
+### Gestione Competitor
+1. Vai su **Price Intelligent > Competitors**.
+2. Clicca su **Add Competitor**.
+3. Compila i dati generali (Nome, Website).
+4. Nel campo **Crawler Configuration (JSON)**, inserisci i selettori CSS per lo scraping:
+   ```json
+   {
+       "product_urls": [
+           "https://competitor.com/prodotto-1",
+           "https://competitor.com/prodotto-2"
+       ],
+       "selectors": {
+           "title": "h1.product-name",
+           "price": ".final-price .price",
+           "ean": {
+               "method": "json_ld",
+               "field": "gtin13"
+           }
+       }
+   }
+   ```
 
-**Admin** > **Price Intelligent** > **Competitors** > **Add New**
+### Gestione Fornitori
+1. Vai su **Price Intelligent > Suppliers**.
+2. Clicca su **Add New Supplier**.
+3. Scegli il **Source Type**:
+   - **Local**: File CSV presente sul server (in `var/suppliers/`).
+   - **FTP**: File CSV su server FTP remoto.
+   - **HTTP**: File CSV accessibile via URL pubblico.
+4. Configura la sorgente nel campo **Source Configuration (JSON)**:
 
-**Configurazione scraping** (JSON):
-```json
-{
-  "product_urls": [
-    "https://competitor.com/product1",
-    "https://competitor.com/product2"
-  ],
-  "selectors": {
-    "sku": ".product-sku",
-    "title": "h1.product-title",
-    "price": ".price-value",
-    "ean": "meta[itemprop='gtin13']"
-  }
-}
-```
+   **Esempio Local (con mapping manuale):**
+   ```json
+   {
+       "path": "listino_fornitore.csv",
+       "delimiter": ";",
+       "columns": {
+           "sku": "codice_articolo",
+           "title": "descrizione",
+           "price": "prezzo_netto"
+       }
+   }
+   ```
+   *Nota: Se `columns` viene omesso, il sistema tenterà di individuare automaticamente le colonne `sku`, `price`, `title`.*
 
-### 2. Aggiungi Fornitore
-
-**Admin** > **Price Intelligent** > **Suppliers** > **Add New**
-
-**Tipi Sorgente**:
-
-#### Local CSV
-```json
-{
-  "source_type": "local",
-  "file_path": "fornitore1.csv",
-  "columns": {
-    "sku": "codice",
-    "title": "titolo_prodotto",
-    "price": "prezzo",
-    "ean": "ean13"
-  }
-}
-```
-
-**Path**:
-- Relativo: `fornitore1.csv` → cerca in `var/suppliers/fornitore1.csv`
-- Assoluto: `/var/www/magento/var/import/fornitore1.csv`
-
-**Nota**: Il campo `columns` è opzionale. Se omesso, usa auto-normalizzazione header.
-
-#### FTP
-```json
-{
-  "source_type": "ftp",
-  "ftp_host": "ftp.supplier.com",
-  "ftp_port": 21,
-  "ftp_username": "user",
-  "ftp_password": "pass",
-  "ftp_path": "/exports/products.csv",
-  "columns": {
-    "sku": "product_code",
-    "title": "product_name",
-    "price": "sale_price"
-  }
-}
-```
-
-#### HTTP
-```json
-{
-  "source_type": "http",
-  "http_url": "https://supplier.com/feed/products.csv",
-  "columns": {
-    "sku": "SKU",
-    "title": "Title",
-    "price": "Price"
-  }
-}
-```
-
-### 3. Formato CSV Fornitore
-
-#### Con Mapping Esplicito (Raccomandato)
-
-Specifica la mappatura delle colonne nel config JSON:
-
-```json
-{
-  "columns": {
-    "sku": "codice_articolo",
-    "title": "descrizione",
-    "price": "prezzo_listino",
-    "ean": "barcode"
-  }
-}
-```
-
-**CSV**:
-```csv
-codice_articolo,descrizione,prezzo_listino,barcode
-PROD001,Prodotto 1,99.90,1234567890123
-PROD002,Prodotto 2,149.50,9876543210987
-```
-
-#### Auto-Normalizzazione (Backward Compatibility)
-
-Se ometti il campo `columns`, il parser tenta di normalizzare automaticamente gli header:
-
-| Campo Normalizzato | Header Supportati |
-|-------------------|-------------------|
-| `sku` | sku, codice, cod |
-| `title` | titolo_prodotto, titolo, title |
-| `price` | prezzo, price, prezzo_vendita |
-| `ean` | ean, ean13, barcode |
-
-**CSV**:
-```csv
-codice,titolo_prodotto,prezzo,ean
-PROD001,Prodotto 1,99.90,1234567890123
-PROD002,Prodotto 2,149.50,9876543210987
-```
+### Analisi Prezzi
+1. Vai su **Price Intelligent > Price Comparisons**.
+2. Qui vedrai una tabella con il confronto tra il tuo "Nostro Prezzo" (dal fornitore importato) e il "Prezzo Competitor" (dallo scraping).
+3. La colonna **Competitivo** indica se il tuo prezzo è uguale o inferiore a quello del competitor.
 
 ---
 
 ## 🖥️ Comandi Console
 
-### Scraping Competitor
+Il modulo fornisce diversi comandi CLI per eseguire le operazioni manualmente o via cron.
 
+### 1. Scraping Competitor
+Esegue lo scraping dei prezzi per i competitor attivi.
 ```bash
-# Scrape tutti i competitor attivi
 php bin/magento cyper:crawler:scrape
-
-# Scrape un competitor specifico
-php bin/magento cyper:crawler:scrape --competitor=1
+# Opzionale: --competitor=<id> per scrapare un solo competitor
 ```
 
-### Import Fornitori
-
+### 2. Import Fornitori
+Scarica e importa i listini dai fornitori configurati.
 ```bash
-# Import tutti i fornitori attivi
 php bin/magento cyper:supplier:match
-
-# Import fornitore specifico
-php bin/magento cyper:supplier:match --supplier=1
+# Opzionale: --supplier=<id> per importare un solo fornitore
 ```
 
-### Trova Miglior Prezzo
-
+### 3. Calcolo Best Price
+Analizza i prezzi importati e determina il miglior prezzo competitor per ogni SKU.
 ```bash
-# Identifica il miglior prezzo competitor per ogni SKU/EAN
 php bin/magento cyper:competitor:find-best
 ```
 
-### Analisi Competitività
-
+### 4. Analisi Competitività
+Genera il report di confronto prezzi.
 ```bash
-# Confronta prezzi fornitore vs competitor
 php bin/magento cyper:analysis:competitiveness
 ```
 
-### Cron Jobs (Raccomandato)
+---
 
-Aggiungi in `crontab.xml`:
+## 🏗️ Struttura e Estensibilità
+
+Il modulo è progettato per essere facilmente estensibile.
+
+### Aggiungere un nuovo Parser
+È possibile implementare nuovi parser per sorgenti dati diverse (es. API JSON, XML, SOAP) implementando l'interfaccia `Cyper\PriceIntelligent\Api\ParserInterface` e registrandoli in `di.xml`.
+
+### Cron Jobs
+Per automatizzare il processo, si consiglia di aggiungere i comandi al crontab di sistema o configurare i cron group di Magento.
+
+Esempio `crontab.xml` (da implementare nel proprio tema/modulo se si desidera automazione nativa):
 ```xml
-<group id="default">
-    <job name="cyper_scrape_competitors" instance="Cyper\PriceIntelligent\Cron\ScrapeCompetitors" method="execute">
-        <schedule>0 2 * * *</schedule>
-    </job>
-    <job name="cyper_import_suppliers" instance="Cyper\PriceIntelligent\Cron\ImportSuppliers" method="execute">
-        <schedule>0 3 * * *</schedule>
-    </job>
-    <job name="cyper_analyze_competitiveness" instance="Cyper\PriceIntelligent\Cron\AnalyzeCompetitiveness" method="execute">
-        <schedule>0 4 * * *</schedule>
-    </job>
-</group>
+<job name="cyper_scrape_competitors" instance="Cyper\PriceIntelligent\Cron\ScrapeCompetitors" method="execute">
+    <schedule>0 2 * * *</schedule> <!-- Ogni notte alle 02:00 -->
+</job>
 ```
-
----
-
-## 🏗️ Struttura Modulo
-
-```
-Cyper/PriceIntelligent/
-├── Api/
-│   ├── CrawlerInterface.php          # Interfaccia scraping
-│   ├── ParserInterface.php            # Interfaccia parser CSV
-│   ├── PriceParserInterface.php       # Interfaccia parsing prezzi
-│   └── ProxyRotatorInterface.php      # Interfaccia proxy rotation
-│
-├── Console/Command/
-│   ├── CrawlerScrapeCommand.php       # Comando scraping
-│   ├── SupplierMatchCommand.php       # Comando import fornitori
-│   ├── CompetitorFindBestCommand.php  # Trova best price
-│   └── AnalysisCompetitivenessCommand.php
-│
-├── Model/
-│   ├── Competitor.php                 # Model competitor
-│   ├── Supplier.php                   # Model fornitore
-│   ├── ParserFactory.php              # Factory parser (estensibile via di.xml)
-│   │
-│   ├── Parser/
-│   │   ├── LocalParser.php            # Parser CSV locale
-│   │   ├── FtpParser.php              # Parser FTP
-│   │   └── HttpParser.php             # Parser HTTP
-│   │
-│   └── Service/
-│       ├── Crawler.php                # Servizio scraping con proxy
-│       ├── PriceParser.php            # Parsing prezzi multi-formato
-│       ├── ProxyPool.php              # Gestione pool proxy
-│       ├── ProxyRotator.php           # Rotazione proxy
-│       ├── SupplierImportService.php  # Import fornitori
-│       └── CompetitivenessAnalysisService.php
-│
-├── etc/
-│   ├── module.xml                     # Definizione modulo
-│   ├── di.xml                         # Dependency Injection
-│   ├── config.xml                     # Configurazioni default (proxy)
-│   ├── db_schema.xml                  # Schema database
-│   │
-│   └── adminhtml/
-│       ├── routes.xml                 # Routes admin
-│       ├── menu.xml                   # Menu admin
-│       └── system.xml                 # Configurazioni admin
-│
-└── view/adminhtml/
-    ├── layout/
-    │   ├── competitors_competitors_index.xml
-    │   ├── competitor_prices_competitorprices_index.xml
-    │   └── price_comparisons_pricecomparisons_index.xml
-    │
-    └── ui_component/
-        ├── cyper_competitors_listing.xml
-        ├── cyper_competitor_prices_listing.xml
-        └── cyper_price_comparisons_listing.xml
-```
-
----
-
-## 🔌 API & Estensibilità
-
-### Aggiungere un Nuovo Parser
-
-**1. Crea la classe Parser**:
-```php
-<?php
-namespace Vendor\Module\Model\Parser;
-
-use Cyper\PriceIntelligent\Api\ParserInterface;
-
-class CustomParser implements ParserInterface
-{
-    public function parse(array $config): array
-    {
-        // Implementazione custom
-        return $products;
-    }
-    
-    public function getType(): string
-    {
-        return 'custom';
-    }
-}
-```
-
-**2. Registra in `di.xml`**:
-```xml
-<type name="Cyper\PriceIntelligent\Model\ParserPool">
-    <arguments>
-        <argument name="parsers" xsi:type="array">
-            <item name="custom" xsi:type="object">Vendor\Module\Model\Parser\CustomParser</item>
-        </argument>
-    </arguments>
-</type>
-```
-
-**Nota**: Il pattern Pool permette facilmente di aggiungere/sovrascrivere parser tramite merge dei configs.
-
-### Override Crawler
-
-```xml
-<preference for="Cyper\PriceIntelligent\Api\CrawlerInterface" 
-            type="Vendor\Module\Model\MyCrawler"/>
-```
-
----
-
-## 🔌 Creare Parser Personalizzati
-
-Il sistema è completamente estensibile. Ogni parser può definire la propria configurazione JSON senza vincoli.
-
-### Esempio: Parser API JSON
-
-**1. Crea la Classe Parser**:
-
-```php
-<?php
-namespace Vendor\Module\Model\Parser;
-
-use Cyper\PriceIntelligent\Api\ParserInterface;
-use Magento\Framework\HTTP\Client\Curl;
-
-class ApiJsonParser implements ParserInterface
-{
-    public function __construct(
-        private readonly Curl $httpClient
-    ) {}
-
-    public function parse(array $config): array
-    {
-        // I tuoi campi custom - nessun vincolo!
-        $apiUrl = $config['api_url'];
-        $apiKey = $config['api_key'] ?? null;
-        $jsonPath = $config['json_path'] ?? 'data.products';
-        $mapping = $config['mapping'] ?? [];
-        
-        // Chiamata API
-        $this->httpClient->addHeader('Authorization', "Bearer $apiKey");
-        $this->httpClient->get($apiUrl);
-        
-        $response = json_decode($this->httpClient->getBody(), true);
-        
-        // Naviga nel JSON usando json_path
-        $items = $this->extractFromPath($response, $jsonPath);
-        
-        $products = [];
-        foreach ($items as $item) {
-            $products[] = [
-                'sku' => $this->getNestedValue($item, $mapping['sku']),
-                'title' => $this->getNestedValue($item, $mapping['title']),
-                'price' => (float) $this->getNestedValue($item, $mapping['price']),
-            ];
-        }
-        
-        return $products;
-    }
-    
-    public function getType(): string
-    {
-        return 'api_json';
-    }
-    
-    private function extractFromPath(array $data, string $path): array
-    {
-        // Implementazione navigazione JSON path (es: "data.items")
-        $keys = explode('.', $path);
-        foreach ($keys as $key) {
-            $data = $data[$key] ?? [];
-        }
-        return is_array($data) ? $data : [];
-    }
-    
-    private function getNestedValue(array $data, string $path)
-    {
-        $keys = explode('.', $path);
-        foreach ($keys as $key) {
-            $data = $data[$key] ?? null;
-            if ($data === null) break;
-        }
-        return $data;
-    }
-}
-```
-
-**2. Registra in `di.xml`**:
-
-```xml
-<type name="Cyper\PriceIntelligent\Model\ParserPool">
-    <arguments>
-        <argument name="parsers" xsi:type="array">
-            <!-- Parser esistenti -->
-            <item name="local" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\LocalParser</item>
-            <item name="ftp" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\FtpParser</item>
-            <item name="http" xsi:type="object">Cyper\PriceIntelligent\Model\Parser\HttpParser</item>
-            
-            <!-- Il tuo parser custom -->
-            <item name="api_json" xsi:type="object">Vendor\Module\Model\Parser\ApiJsonParser</item>
-        </argument>
-    </arguments>
-</type>
-```
-
-**3. Configura Supplier con JSON Custom**:
-
-```json
-{
-  "source_type": "api_json",
-  "api_url": "https://api.supplier.com/v1/products",
-  "api_key": "your-secret-key-123",
-  "json_path": "data.items",
-  "mapping": {
-    "sku": "product.code",
-    "title": "product.name",
-    "price": "pricing.wholesale"
-  }
-}
-```
-
-### 💡 Vantaggi del Design
-
-- **Zero Vincoli**: Ogni parser riceve l'intero array `$config` e decide come interpretarlo
-- **Indipendenza**: Parser custom non influenzano quelli esistenti
-- **Flessibilità**: Puoi mixare parser con strutture JSON diverse
-- **Estensibilità**: Aggiungi nuovi parser senza modificare codice esistente
-
-### Esempi Parser Custom
-
-#### Parser XML Feed
-```json
-{
-  "source_type": "xml_feed",
-  "xml_url": "https://supplier.com/feed.xml",
-  "xpath_products": "//product",
-  "xpath_sku": "./sku/text()",
-  "xpath_title": "./name/text()",
-  "xpath_price": "./price/@value"
-}
-```
-
-#### Parser Database Esterno
-```json
-{
-  "source_type": "external_db",
-  "db_host": "db.supplier.com",
-  "db_name": "products",
-  "db_user": "readonly",
-  "db_pass": "secret",
-  "query": "SELECT code, name, price FROM products WHERE active=1"
-}
-```
-
-#### Parser Google Sheets
-```json
-{
-  "source_type": "google_sheets",
-  "sheet_id": "1A2B3C4D5E6F7G8H",
-  "range": "Products!A2:D1000",
-  "credentials_file": "/path/to/service-account.json",
-  "columns": {
-    "sku": 0,
-    "title": 1,
-    "price": 2
-  }
-}
-```
-
-### 📝 Best Practices
-
-1. **Prefissi Campi**: Usa prefissi per evitare collisioni (es: `api_`, `db_`, `xml_`)
-2. **Validazione**: Valida sempre i campi richiesti nel metodo `parse()`
-3. **Error Handling**: Lancia `LocalizedException` con messaggi chiari
-4. **Logging**: Usa `LoggerInterface` per debug e monitoraggio
-5. **Type Identifier**: Il metodo `getType()` deve essere univoco
-
----
-
-## 🐛 Troubleshooting
-
-### Errore: "Cannot instantiate interface"
-
-```bash
-rm -rf generated/code/* generated/metadata/*
-php bin/magento setup:di:compile
-```
-
-### Proxy non funzionano
-
-1. Verifica configurazione in Admin
-2. Controlla log: `var/log/system.log`
-3. Testa proxy manualmente
-4. Aumenta `max_retries`
-
-### CSV non viene importato
-
-1. Verifica path: `var/suppliers/<file>`
-2. Controlla permessi: `chmod 664 var/suppliers/*.csv`
-3. Verifica formato header CSV
-4. Controlla log: `var/log/system.log`
-
----
-
-## 📝 License
-
-Proprietario
-
-## 👥 Contributors
-
-- **Developer**: Cyper Development Team
-
-## 🔗 Links
-
-- **Repository**: https://github.com/su8z3r0/price-inelligent-module
-- **Laravel Version**: https://github.com/su8z3r0/price-monitoring-system
-
----
-
-## 📞 Support
-
-Per supporto tecnico, apri una issue su GitHub.
