@@ -124,7 +124,7 @@ class CompetitorFindBestCommand extends Command
     private function getCompetitorName(int $competitorId): string
     {
         try {
-            $competitor = $this->competitorRepository->get($competitorId);
+            $competitor = $this->competitorRepository->getById($competitorId);
             return $competitor->getName();
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             return 'Unknown';
