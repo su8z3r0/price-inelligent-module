@@ -30,7 +30,7 @@ class Edit extends Action
         if ($id) {
             $model->load($id);
             if (!$model->getId()) {
-                $this->messageManager->addErrorMessage(__('Competitor non trovato.'));
+                $this->messageManager->addErrorMessage(__('Competitor not found.'));
                 return $this->resultRedirectFactory->create()->setPath('*/*/');
             }
         }
@@ -40,7 +40,7 @@ class Edit extends Action
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Cyper_PriceIntelligent::competitors');
         $resultPage->getConfig()->getTitle()->prepend(
-            $model->getId() ? __('Modifica Competitor') : __('Nuovo Competitor')
+            $model->getId() ? __('Edit Competitor') : __('New Competitor')
         );
 
         return $resultPage;

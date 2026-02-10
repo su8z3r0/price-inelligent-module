@@ -22,6 +22,7 @@ Modulo avanzato per il monitoraggio dei prezzi dei competitor, l'importazione de
 ### 🔍 Scraping Competitor
 - **Monitoraggio Prezzi**: Estrazione automatica dei prezzi dai siti competitor.
 - **Proxy Rotation**: Supporto nativo per rotazione proxy per evitare blocchi IP.
+- **Validazione Proattiva**: Verifica automatica dei proxy prima dell'uso (tramite ping paralleli).
 - **Estrazione Intelligente**: Supporta selettori CSS, Meta Tags (OpenGraph), JSON-LD e Data Attributes per trovare EAN e Prezzi.
 - **Rate Limiting**: Configurazione dei ritardi tra le richieste per simulare il comportamento umano.
 

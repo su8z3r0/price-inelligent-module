@@ -22,7 +22,7 @@ class Index extends Action
     {
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Cyper_PriceIntelligent::price_comparisons');
-        $resultPage->getConfig()->getTitle()->prepend(__('Analisi Competitività'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Competitiveness Analysis'));
         
         return $resultPage;
     }

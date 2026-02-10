@@ -62,7 +62,7 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                 throw new \RuntimeException('Invalid response format from GeoNode API');
             }
 
-            $proxies = [];
+            $candidates = [];
             foreach ($data['data'] as $item) {
                 if (empty($item['ip']) || empty($item['port']) || empty($item['protocols'])) {
                     continue;
@@ -95,7 +95,7 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                     $protocol = 'socks4';
                 }
 
-                $proxies[] = [
+                $candidates[] = [
                     'url' => $item['ip'] . ':' . $item['port'],
                     'protocol' => $protocol,
                     'username' => null, 
@@ -105,16 +105,19 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
                 ];
             }
 
-            if (!empty($proxies)) {
+            // --- PROACTIVE VALIDATION STEP ---
+            $validProxies = $this->validateProxies($candidates);
+
+            if (!empty($validProxies)) {
                 $this->cache->save(
-                    $this->serializer->serialize($proxies),
+                    $this->serializer->serialize($validProxies),
                     self::CACHE_KEY,
                     ['price_intelligent_proxies'],
                     self::CACHE_LIFETIME
                 );
-                $this->logger->info('Updated proxy list with ' . count($proxies) . ' Optimized Proxies (Latency < ' . ($maxLatency ?: 'Inf') . 'ms, SOCKS Only)');
+                $this->logger->info('Updated proxy list with ' . count($validProxies) . ' Validated Proxies (from ' . count($candidates) . ' candidates)');
             } else {
-                $this->logger->warning('No optimized proxies found. Check API or Max Latency settings.');
+                $this->logger->warning('No working proxies found after validation.');
             }
 
         } catch (\Exception $e) {
@@ -122,6 +125,77 @@ class GeoNodeProxyProvider implements ProxyProviderInterface
         }
     }
 
+    /**
+     * Validate proxies in parallel using curl_multi
+     * 
+     * @param array $proxies
+     * @return array
+     */
+    private function validateProxies(array $proxies): array
+    {
+        if (empty($proxies)) {
+            return [];
+        }
+
+        $this->logger->info('Validating ' . count($proxies) . ' proxies...');
+        
+        $mh = curl_multi_init();
+        $channels = [];
+        $validProxies = [];
+        
+        // Target URL for validation (lightweight and reliable)
+        $testUrl = 'http://www.google.com';
+
+        foreach ($proxies as $key => $proxy) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $testUrl);
+            curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request only
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5); // Short timeout for validation
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+            
+            $proxyUrl = $proxy['url'];
+            curl_setopt($ch, CURLOPT_PROXY, $proxyUrl);
+            
+            if ($proxy['protocol'] === 'socks5') {
+                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
+            } elseif ($proxy['protocol'] === 'socks4') {
+                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
+            }
+            
+            curl_multi_add_handle($mh, $ch);
+            $channels[$key] = $ch;
+        }
+
+        // Execute handles
+        $active = null;
+        do {
+            $status = curl_multi_exec($mh, $active);
+            if ($active) {
+                // Wait a short time for more activity
+                curl_multi_select($mh);
+            }
+        } while ($active && $status == CURLM_OK);
+
+        // Collect results
+        foreach ($channels as $key => $ch) {
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            
+            if ($httpCode >= 200 && $httpCode < 400) {
+                $validProxies[] = $proxies[$key];
+            } else {
+                // Determine error for logging (optional, verbose)
+                // $error = curl_error($ch);
+            }
+            
+            curl_multi_remove_handle($mh, $ch);
+            curl_close($ch);
+        }
+        
+        curl_multi_close($mh);
+        
+        return $validProxies;
+    }
 
     public function removeProxy(string $proxyUrl): void
     {
