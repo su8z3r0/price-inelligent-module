@@ -57,11 +57,18 @@ class CrawlerScrapeCommand extends Command
                 $productData = $this->crawler->scrapeProduct($config, $url);
 
                 if ($productData) {
+                    $sku = $productData['ean'] ?? null;
+
+                    if (empty($sku) || $sku === 'UNKNOWN') {
+                        $output->writeln("<error>Skipping {$url}: Missing or invalid SKU/EAN</error>");
+                        continue;
+                    }
+
                     $competitorPrice = $this->competitorPricesFactory;
                     $competitorPrice->setData([
                         'competitor_id' => $competitor->getId(),
-                        'sku' => $productData['ean'] ?? 'UNKNOWN',
-                        'normalized_sku' => $this->normalizeSku($productData['ean'] ?? ''),
+                        'sku' => $sku,
+                        'normalized_sku' => $this->normalizeSku($sku),
                         'product_title' => $productData['product_title'],
                         'sale_price' => $productData['sale_price'],
                         'product_url' => $productData['product_url'],
