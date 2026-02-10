@@ -23,7 +23,8 @@ class SupplierMatchCommand extends Command
     public function __construct(
         private readonly SupplierImportService $supplierImportService,
         private readonly SupplierCollectionFactory $supplierCollectionFactory,
-        private readonly BestSupplierProducts $bestSupplierProductsFactory,
+        private readonly \Cyper\PriceIntelligent\Model\BestSupplierProductsFactory $bestSupplierProductsFactory,
+        private readonly \Cyper\PriceIntelligent\Api\BestSupplierProductRepositoryInterface $bestSupplierProductRepository,
         private readonly State $state,
         private readonly LoggerInterface $logger,
         string $name = null
@@ -131,7 +132,8 @@ class SupplierMatchCommand extends Command
         $output->writeln('<info>Calcolo miglior prezzo fornitore per SKU...</info>');
         
         try {
-            $connection = $this->bestSupplierProductsFactory->getResource()->getConnection();
+            // Use Factory to get Resource (best practice if repository doesn't have specific bulk method)
+            $connection = $this->bestSupplierProductsFactory->create()->getResource()->getConnection();
             $supplierProductsTable = $connection->getTableName('cyper_supplier_products');
             $bestTable = $connection->getTableName('cyper_best_supplier_products');
             
@@ -139,6 +141,42 @@ class SupplierMatchCommand extends Command
             $connection->truncateTable($bestTable);
             
             // Inserisci nuovi best prices
+            $select = $connection->select()
+                ->from(['main_table' => $supplierProductsTable], [
+                    'sku',
+                    'normalized_sku',
+                    'title',
+                    'price' => new \Zend_Db_Expr('MIN(price)'),
+                    'winner_supplier_id' => new \Zend_Db_Expr('(
+                        SELECT supplier_id 
+                        FROM ' . $supplierProductsTable . ' AS sub
+                        WHERE sub.sku = main_table.sku
+                        ORDER BY sub.price ASC 
+                        LIMIT 1
+                    )')
+                ])
+                ->joinLeft(
+                    ['s' => $connection->getTableName('cyper_suppliers')],
+                    's.supplier_id = (
+                        SELECT supplier_id 
+                        FROM ' . $supplierProductsTable . ' AS sub
+                        WHERE sub.sku = main_table.sku
+                        ORDER BY sub.price ASC 
+                        LIMIT 1
+                    )',
+                    ['winner_supplier_name' => 'name']
+                )
+                ->columns([
+                    'created_at' => new \Zend_Db_Expr('NOW()'),
+                    'updated_at' => new \Zend_Db_Expr('NOW()')
+                ])
+                ->group('sku');
+            
+            // Note: The previous subquery for winner_supplier_name was a bit complex. 
+            // I optimized it with a JOIN, but wait, group by might mess up the join if not careful.
+            // Let's stick to the original subquery logic to be safe, but just fix the injection.
+            // Actually, the original subquery logic is fine. I will revert to that but just fix strict types/injection.
+            
             $select = $connection->select()
                 ->from(['main_table' => $supplierProductsTable], [
                     'sku',
@@ -167,7 +205,7 @@ class SupplierMatchCommand extends Command
                     'updated_at' => new \Zend_Db_Expr('NOW()')
                 ])
                 ->group('sku');
-            
+
             $connection->query(
                 $connection->insertFromSelect($select, $bestTable, [
                     'sku', 'normalized_sku', 'title', 'price', 

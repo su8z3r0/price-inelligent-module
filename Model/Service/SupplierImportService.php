@@ -14,7 +14,8 @@ class SupplierImportService
 {
     public function __construct(
         private readonly ParserFactory $parserFactory,
-        private readonly SupplierProducts $supplierProductsFactory,
+        private readonly \Cyper\PriceIntelligent\Model\SupplierProductsFactory $supplierProductsFactory,
+        private readonly \Cyper\PriceIntelligent\Api\SupplierProductRepositoryInterface $supplierProductRepository,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -80,7 +81,8 @@ class SupplierImportService
      */
     private function saveProduct(Supplier $supplier, array $productData): void
     {
-        $supplierProduct = $this->supplierProductsFactory;
+        /** @var \Cyper\PriceIntelligent\Model\SupplierProducts $supplierProduct */
+        $supplierProduct = $this->supplierProductsFactory->create();
         
         $supplierProduct->setData([
             'supplier_id' => $supplier->getId(),
@@ -91,7 +93,7 @@ class SupplierImportService
             'imported_at' => date('Y-m-d H:i:s')
         ]);
         
-        $supplierProduct->save();
+        $this->supplierProductRepository->save($supplierProduct);
     }
 
     /**

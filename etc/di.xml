@@ -12,6 +12,8 @@
     <preference for="Cyper\PriceIntelligent\Api\PriceComparisonsRepositoryInterface" type="Cyper\PriceIntelligent\Repository\PriceComparisonsRepository"/>
     <preference for="Cyper\PriceIntelligent\Api\CompetitorPriceRepositoryInterface" type="Cyper\PriceIntelligent\Model\CompetitorPriceRepository"/>
     <preference for="Cyper\PriceIntelligent\Api\BestCompetitorPriceRepositoryInterface" type="Cyper\PriceIntelligent\Model\BestCompetitorPriceRepository"/>
+    <preference for="Cyper\PriceIntelligent\Api\SupplierProductRepositoryInterface" type="Cyper\PriceIntelligent\Model\SupplierProductRepository"/>
+    <preference for="Cyper\PriceIntelligent\Api\BestSupplierProductRepositoryInterface" type="Cyper\PriceIntelligent\Model\BestSupplierProductRepository"/>
 
     <!-- Data Interface Preferences -->
     <preference for="Cyper\PriceIntelligent\Api\Data\CompetitorInterface" type="Cyper\PriceIntelligent\Model\Competitor"/>
