@@ -24,7 +24,8 @@ class CrawlerScrapeCommand extends Command
     public function __construct(
         private readonly Crawler $crawler,
         private readonly CompetitorCollectionFactory $competitorCollectionFactory,
-        private readonly CompetitorPrices $competitorPricesFactory,
+        private readonly \Cyper\PriceIntelligent\Model\CompetitorPricesFactory $competitorPricesFactory,
+        private readonly \Cyper\PriceIntelligent\Api\CompetitorPriceRepositoryInterface $competitorPriceRepository,
         private readonly State $state,
         private readonly LoggerInterface $logger,
         private readonly \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -64,7 +65,8 @@ class CrawlerScrapeCommand extends Command
                         continue;
                     }
 
-                    $competitorPrice = $this->competitorPricesFactory;
+                    /** @var CompetitorPrices $competitorPrice */
+                    $competitorPrice = $this->competitorPricesFactory->create();
                     $competitorPrice->setData([
                         'competitor_id' => $competitor->getId(),
                         'sku' => $sku,
@@ -74,7 +76,7 @@ class CrawlerScrapeCommand extends Command
                         'product_url' => $productData['product_url'],
                         'scraped_at' => date('Y-m-d H:i:s')
                     ]);
-                    $competitorPrice->save();
+                    $this->competitorPriceRepository->save($competitorPrice);
                     $count++;
                 }
 

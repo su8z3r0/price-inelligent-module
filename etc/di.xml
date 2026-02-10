@@ -10,6 +10,8 @@
     <preference for="Cyper\PriceIntelligent\Api\CompetitorRepositoryInterface" type="Cyper\PriceIntelligent\Repository\CompetitorRepository"/>
     <preference for="Cyper\PriceIntelligent\Api\SupplierRepositoryInterface" type="Cyper\PriceIntelligent\Repository\SupplierRepository"/>
     <preference for="Cyper\PriceIntelligent\Api\PriceComparisonsRepositoryInterface" type="Cyper\PriceIntelligent\Repository\PriceComparisonsRepository"/>
+    <preference for="Cyper\PriceIntelligent\Api\CompetitorPriceRepositoryInterface" type="Cyper\PriceIntelligent\Model\CompetitorPriceRepository"/>
+    <preference for="Cyper\PriceIntelligent\Api\BestCompetitorPriceRepositoryInterface" type="Cyper\PriceIntelligent\Model\BestCompetitorPriceRepository"/>
 
     <!-- Data Interface Preferences -->
     <preference for="Cyper\PriceIntelligent\Api\Data\CompetitorInterface" type="Cyper\PriceIntelligent\Model\Competitor"/>

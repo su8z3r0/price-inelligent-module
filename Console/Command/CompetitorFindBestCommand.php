@@ -17,6 +17,8 @@ class CompetitorFindBestCommand extends Command
     public function __construct(
         private readonly CompetitorPricesCollectionFactory $competitorPricesCollectionFactory,
         private readonly BestCompetitorPricesFactory $bestCompetitorPricesFactory,
+        private readonly \Cyper\PriceIntelligent\Api\BestCompetitorPriceRepositoryInterface $bestCompetitorPriceRepository,
+        private readonly \Cyper\PriceIntelligent\Api\CompetitorRepositoryInterface $competitorRepository,
         private readonly State $state,
         private readonly LoggerInterface $logger,
         string $name = null
@@ -65,26 +67,32 @@ class CompetitorFindBestCommand extends Command
             foreach ($collection as $item) {
                 try {
                     // Cancella record esistente per questo SKU
-                    // Note: Factory::create() returns a model instance. getCollection() is on the model resource, not the factory directly usually.
-                    // Correct pattern: $factory->create()->getCollection()
+                    // Correct pattern: use repository to delete if possible, or collection delete
+                    // Ideally we should truncate the table before starting or use upsert
+                    // For now, adhering to existing logic but using Collection properly
                     $existingCollection = $this->bestCompetitorPricesFactory->create()->getCollection();
                     $existingCollection->addFieldToFilter('sku', $item->getSku());
                     
                     foreach ($existingCollection as $existing) {
-                        $existing->delete();
+                        $this->bestCompetitorPriceRepository->delete($existing);
                     }
 
                     // Crea nuovo record
+                    /** @var \Cyper\PriceIntelligent\Model\BestCompetitorPrices $bestPrice */
                     $bestPrice = $this->bestCompetitorPricesFactory->create();
+                    
+                    $winnerId = (int)$item->getWinnerCompetitorId();
+                    $competitorName = $this->getCompetitorName($winnerId);
+
                     $bestPrice->setData([
                         'sku' => $item->getSku(),
                         'normalized_sku' => $this->normalizeSku($item->getSku()),
                         'product_title' => $item->getProductTitle(),
                         'sale_price' => $item->getSalePrice(),
-                        'winner_competitor_id' => $item->getWinnerCompetitorId(),
-                        'winner_competitor_name' => $this->getCompetitorName((int)$item->getWinnerCompetitorId())
+                        'winner_competitor_id' => $winnerId,
+                        'winner_competitor_name' => $competitorName
                     ]);
-                    $bestPrice->save();
+                    $this->bestCompetitorPriceRepository->save($bestPrice);
                     
                     $processed++;
                 } catch (\Exception $e) {
@@ -115,8 +123,11 @@ class CompetitorFindBestCommand extends Command
 
     private function getCompetitorName(int $competitorId): string
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $competitor = $objectManager->create(\Cyper\PriceIntelligent\Model\Competitor::class)->load($competitorId);
-        return $competitor->getName() ?? 'Unknown';
+        try {
+            $competitor = $this->competitorRepository->get($competitorId);
+            return $competitor->getName();
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            return 'Unknown';
+        }
     }
 }
