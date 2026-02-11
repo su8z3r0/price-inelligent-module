@@ -44,10 +44,10 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
-        <column name="winner_supplier_id">
+        <column name="winner_supplier_name">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Winner Supplier ID</label>
+                <label translate="true">Winner Supplier</label>
             </settings>
         </column>
         <column name="sku">
