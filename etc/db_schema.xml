@@ -30,7 +30,7 @@
         <column xsi:type="bigint" name="supplier_id" unsigned="true" nullable="false" comment="Supplier ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
+
         <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
         <column xsi:type="timestamp" name="imported_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Imported At"/>
@@ -53,9 +53,7 @@
         <index referenceId="CYPER_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
         </index>
-        <index referenceId="CYPER_SUPPLIER_PRODUCTS_EAN_INDEX" indexType="btree">
-            <column name="ean"/>
-        </index>
+
         <index referenceId="CYPER_SUPPLIER_PRODUCTS_IMPORTED_AT_INDEX" indexType="btree">
             <column name="imported_at"/>
         </index>
@@ -92,7 +90,7 @@
         <column xsi:type="bigint" name="competitor_id" unsigned="true" nullable="false" comment="Competitor ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
+
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
         <column xsi:type="text" name="product_url" nullable="true" comment="Product URL"/>
@@ -117,9 +115,7 @@
         <index referenceId="CYPER_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
         </index>
-        <index referenceId="CYPER_COMPETITOR_PRICES_EAN_INDEX" indexType="btree">
-            <column name="ean"/>
-        </index>
+
         <index referenceId="CYPER_COMPETITOR_PRICES_SCRAPED_AT_INDEX" indexType="btree">
             <column name="scraped_at"/>
         </index>
@@ -168,7 +164,7 @@
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
-        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
+
         <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
         <column xsi:type="bigint" name="winner_supplier_id" unsigned="true" nullable="true" comment="Winner Supplier ID"/>
