@@ -184,7 +184,7 @@
                     table="cyper_best_supplier_products" column="winner_supplier_id" referenceTable="cyper_suppliers"
                     referenceColumn="supplier_id" onDelete="SET NULL"/>
 
-        <constraint xsi:type="unique" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_UNIQUE">
+        <constraint xsi:type="unique" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_UNQ">
             <column name="sku"/>
         </constraint>
         <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
@@ -217,7 +217,7 @@
                     table="cyper_best_competitor_prices" column="winner_competitor_id" referenceTable="cyper_competitors"
                     referenceColumn="competitor_id" onDelete="SET NULL"/>
 
-        <constraint xsi:type="unique" referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_UNIQUE">
+        <constraint xsi:type="unique" referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_UNQ">
             <column name="sku"/>
         </constraint>
         <index referenceId="CYPER_BEST_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
