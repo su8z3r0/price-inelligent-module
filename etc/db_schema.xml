@@ -30,6 +30,7 @@
         <column xsi:type="bigint" name="supplier_id" unsigned="true" nullable="false" comment="Supplier ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
         <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
         <column xsi:type="timestamp" name="imported_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Imported At"/>
@@ -51,6 +52,9 @@
         </index>
         <index referenceId="CYPER_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_SUPPLIER_PRODUCTS_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
         </index>
         <index referenceId="CYPER_SUPPLIER_PRODUCTS_IMPORTED_AT_INDEX" indexType="btree">
             <column name="imported_at"/>
@@ -88,6 +92,7 @@
         <column xsi:type="bigint" name="competitor_id" unsigned="true" nullable="false" comment="Competitor ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
         <column xsi:type="varchar" name="product_title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="sale_price" nullable="false" scale="2" precision="10" comment="Sale Price"/>
         <column xsi:type="text" name="product_url" nullable="true" comment="Product URL"/>
@@ -111,6 +116,9 @@
 
         <index referenceId="CYPER_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
+        </index>
+        <index referenceId="CYPER_COMPETITOR_PRICES_EAN_INDEX" indexType="btree">
+            <column name="ean"/>
         </index>
         <index referenceId="CYPER_COMPETITOR_PRICES_SCRAPED_AT_INDEX" indexType="btree">
             <column name="scraped_at"/>
@@ -160,6 +168,7 @@
         <column xsi:type="bigint" name="id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
         <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
         <column xsi:type="varchar" name="normalized_sku" nullable="false" length="255" comment="Normalized SKU"/>
+        <column xsi:type="varchar" name="ean" nullable="true" length="255" comment="EAN"/>
         <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Product Title"/>
         <column xsi:type="decimal" name="price" nullable="false" scale="2" precision="10" comment="Price"/>
         <column xsi:type="bigint" name="winner_supplier_id" unsigned="true" nullable="true" comment="Winner Supplier ID"/>
@@ -174,6 +183,10 @@
         <constraint xsi:type="foreign" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_WINNER_SUPPLIER_ID_CYPER_SUPPLIERS_SUPPLIER_ID"
                     table="cyper_best_supplier_products" column="winner_supplier_id" referenceTable="cyper_suppliers"
                     referenceColumn="supplier_id" onDelete="SET NULL"/>
+
+        <constraint xsi:type="unique" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_UNIQUE">
+            <column name="sku"/>
+        </constraint>
 
         <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_INDEX" indexType="btree">
             <column name="sku"/>
@@ -207,6 +220,10 @@
         <constraint xsi:type="foreign" referenceId="CYPER_BEST_COMPETITOR_PRICES_WINNER_COMPETITOR_ID_CYPER_COMPETITORS_COMPETITOR_ID"
                     table="cyper_best_competitor_prices" column="winner_competitor_id" referenceTable="cyper_competitors"
                     referenceColumn="competitor_id" onDelete="SET NULL"/>
+
+        <constraint xsi:type="unique" referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_UNIQUE">
+            <column name="sku"/>
+        </constraint>
 
         <index referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
             <column name="sku"/>
