@@ -187,10 +187,6 @@
         <constraint xsi:type="unique" referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_UNIQUE">
             <column name="sku"/>
         </constraint>
-
-        <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_SKU_INDEX" indexType="btree">
-            <column name="sku"/>
-        </index>
         <index referenceId="CYPER_BEST_SUPPLIER_PRODUCTS_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
         </index>
@@ -224,10 +220,6 @@
         <constraint xsi:type="unique" referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_UNIQUE">
             <column name="sku"/>
         </constraint>
-
-        <index referenceId="CYPER_BEST_COMPETITOR_PRICES_SKU_INDEX" indexType="btree">
-            <column name="sku"/>
-        </index>
         <index referenceId="CYPER_BEST_COMPETITOR_PRICES_NORMALIZED_SKU_INDEX" indexType="btree">
             <column name="normalized_sku"/>
         </index>
