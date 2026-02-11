@@ -44,10 +44,10 @@
                 <sorting>desc</sorting>
             </settings>
         </column>
-        <column name="supplier_id">
+        <column name="winner_supplier_id">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Supplier ID</label>
+                <label translate="true">Winner Supplier ID</label>
             </settings>
         </column>
         <column name="sku">
@@ -69,7 +69,7 @@
                 <label translate="true">Best Price</label>
             </settings>
         </column>
-        <column name="imported_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+        <column name="created_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
             <settings>
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
